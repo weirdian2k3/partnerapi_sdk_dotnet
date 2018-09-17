@@ -67,7 +67,7 @@ namespace Walmart.Sdk.Base.Primitive
 			return serializer.Deserialize<TPayload>(content);
 		}
 
-		public virtual ISerializer GetSerializer()
+		public ISerializer GetSerializer()
 		{
 			return payloadFactory.GetSerializer(config.ApiFormat);
 		}

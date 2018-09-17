@@ -16,14 +16,15 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V3.Payload
 {
-    public enum FeedType
-    {
-        item,
-        price,
-        promo,
-        inventory,
-        CONTENT_PRODUCT,
-        SUPPLIER_FULL_ITEM,
-        CPT_SELLER_ELIGIBILITY,
-    }
+	public enum FeedType
+	{
+		item,
+		price,
+		promo,
+		inventory,
+		CONTENT_PRODUCT,
+		SUPPLIER_FULL_ITEM,
+		CPT_SELLER_ELIGIBILITY,
+		RETURNS_OVERRIDES,
+	}
 }
