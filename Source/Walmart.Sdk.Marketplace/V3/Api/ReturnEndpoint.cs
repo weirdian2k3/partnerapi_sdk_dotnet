@@ -58,12 +58,18 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			return await GetAllReturns(returnCreationStartDate: returnCreationStartDate, returnCreationEndDate: returnCreationEndDate, limit: limit);
 		}
 
+		public async Task<ReturnsListType> GetNextReturns(string nextCursor)
+		{
+			return await GetAllReturns(nextCursor: nextCursor);
+		}
+
 		private async Task<ReturnsListType> GetAllReturns(string returnOrderId = null,
 														 string customerOrderId = null,
 														 DateTime? returnCreationStartDate = null,
 														 DateTime? returnCreationEndDate = null,
 														 int limit = 0,
-														 ReturnStatus? status = null)
+														 ReturnStatus? status = null,
+														 string nextCursor = null)
 		{
 			// to avoid deadlock if this method is executed synchronously
 			await new ContextRemover();
@@ -90,6 +96,14 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			if (status.HasValue)
 			{
 				request.QueryParams.Add("status", Enum.GetName(typeof(ReturnStatus), status.Value));
+			}
+
+			if (request.QueryParams.Count == 0)
+			{
+				if (!string.IsNullOrWhiteSpace(nextCursor))
+				{
+					request.EndpointUri = String.Format("/v3/returns/{0}", nextCursor);
+				}
 			}
 
 			var response = await client.GetAsync(request);
