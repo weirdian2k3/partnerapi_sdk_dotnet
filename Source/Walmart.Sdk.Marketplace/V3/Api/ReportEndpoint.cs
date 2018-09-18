@@ -25,6 +25,7 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 	using Walmart.Sdk.Base.Serialization;
 	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
 	using System.IO;
+	using System.Linq;
 
 	public class ReportEndpoint : BaseEndpoint
 	{
@@ -61,6 +62,37 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			var response = await client.GetAsync(request);
 			var result = await response.RawResponse.Content.ReadAsByteArrayAsync();
 			return result;
+		}
+
+		public async Task<string> SaveReconFile(string date, string directoryToSaveCsvTo)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
+
+			var request = CreateRequest();
+
+			request.EndpointUri = String.Format("/v3/report/reconreport/reconFile?reportDate={0}", date);
+			request.HttpRequest.Headers.Add("Accept", "application/octet-stream");
+
+			var response = await client.GetAsync(request);
+
+			var destinationFilePath = string.Empty;
+
+			if(response.RawResponse.Headers.TryGetValues("Content-Disposition", out var contentDispositionValues))
+			{
+				var contentDispositionHeaderValue = new System.Net.Http.Headers.ContentDispositionHeaderValue(contentDispositionValues.First());
+				destinationFilePath = System.IO.Path.Combine(directoryToSaveCsvTo, contentDispositionHeaderValue.FileName);
+			}
+			else
+			{
+				destinationFilePath = System.IO.Path.Combine(directoryToSaveCsvTo, string.Format("{0}-recon-report.csv", date));
+			}
+				
+			var result = await response.RawResponse.Content.ReadAsByteArrayAsync();
+
+			System.IO.File.WriteAllBytes(destinationFilePath, result);
+
+			return destinationFilePath;
 		}
 	}
 }
