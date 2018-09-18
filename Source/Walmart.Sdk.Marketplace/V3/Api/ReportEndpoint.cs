@@ -26,6 +26,7 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
 	using System.IO;
 	using System.Linq;
+	using System.Net.Http.Headers;
 
 	public class ReportEndpoint : BaseEndpoint
 	{
@@ -64,6 +65,29 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			return result;
 		}
 
+		private async Task<string> SaveReportFile(IResponse response, string directoryToSaveTo)
+		{
+			var destinationFilePath = string.Empty;
+
+			if (!response.RawResponse.Headers.TryGetValues("Content-Disposition", out var contentDispositionValues))
+			{
+				throw new InvalidDataException("Unable to pull filename from Content-Disposition");
+			}
+
+			var contentDispositionHeaderValue = new ContentDispositionHeaderValue(contentDispositionValues.First());
+			destinationFilePath = Path.Combine(directoryToSaveTo, contentDispositionHeaderValue.FileName);
+
+			using (var responseStream = await response.RawResponse.Content.ReadAsStreamAsync())
+			{
+				using (var fileStream = new FileStream(destinationFilePath, FileMode.Create, FileAccess.Write))
+				{
+					await responseStream.CopyToAsync(fileStream);
+				}
+			}
+
+			return destinationFilePath;
+		}
+
 		public async Task<string> SaveReconFile(string date, string directoryToSaveCsvTo)
 		{
 			// to avoid deadlock if this method is executed synchronously
@@ -76,21 +100,7 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 
 			var response = await client.GetAsync(request);
 
-			var destinationFilePath = string.Empty;
-
-			if(response.RawResponse.Headers.TryGetValues("Content-Disposition", out var contentDispositionValues))
-			{
-				var contentDispositionHeaderValue = new System.Net.Http.Headers.ContentDispositionHeaderValue(contentDispositionValues.First());
-				destinationFilePath = System.IO.Path.Combine(directoryToSaveCsvTo, contentDispositionHeaderValue.FileName);
-			}
-			else
-			{
-				destinationFilePath = System.IO.Path.Combine(directoryToSaveCsvTo, string.Format("{0}-recon-report.csv", date));
-			}
-				
-			var result = await response.RawResponse.Content.ReadAsByteArrayAsync();
-
-			System.IO.File.WriteAllBytes(destinationFilePath, result);
+			var destinationFilePath = await SaveReportFile(response, directoryToSaveCsvTo);
 
 			return destinationFilePath;
 		}
