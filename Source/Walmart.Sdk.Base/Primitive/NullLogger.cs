@@ -14,21 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Walmart.Sdk.Base.Primitive
 {
-    public class NullLogger: ILoggerAdapter
-    {
-        public void Info(string message) { }
-        public void Debug(string message) { }
-        public void Warning(string message) { }
-        public void Error(string message) { }
-        public void Fatal(string message) { }
-        public bool IsLevelEnabled(LogLevel level) => false;
-    }
+	public class NullLogger : ILoggerAdapter
+	{
+		public void Info(string message) { }
+		public void Debug(string message) { }
+		public void Warning(string message) { }
+		public void Error(string message) { }
+		public void Fatal(string message) { }
+		public bool IsLevelEnabled(LogLevel level)
+		{
+			return false;
+		}
+	}
 }

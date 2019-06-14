@@ -14,23 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Walmart.Sdk.Base.Http.Fetcher;
 
 namespace Walmart.Sdk.Base.Http.Retry
 {
-    public class LuckyMePolicy: BasePolicy
-    {
-        public override async Task<IResponse> GetResponse(Http.Fetcher.IFetcher fetcher, IRequest request)
-        {
-            if (await ExecuteOnce(fetcher, request))
-                return response;
-            else
-                throw latestException;
-        }
-    }
+	public class LuckyMePolicy : BasePolicy
+	{
+		public override async Task<IResponse> GetResponse(Http.Fetcher.IFetcher fetcher, IRequest request)
+		{
+			if (await ExecuteOnce(fetcher, request))
+			{
+				return response;
+			}
+			else
+			{
+				throw latestException;
+			}
+		}
+	}
 }

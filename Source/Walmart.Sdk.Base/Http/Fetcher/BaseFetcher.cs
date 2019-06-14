@@ -14,21 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Walmart.Sdk.Base.Http.Fetcher
 {
-    public abstract class BaseFetcher: IFetcher
-    {
-        protected Primitive.Config.IHttpConfig config;
+	public abstract class BaseFetcher : IFetcher
+	{
+		protected Primitive.Config.IHttpConfig config;
 
-        public BaseFetcher(Primitive.Config.IHttpConfig config)
-        {
-            this.config = config;
-        }
+		public BaseFetcher(Primitive.Config.IHttpConfig config)
+		{
+			this.config = config;
+		}
 
-        abstract public Task<IResponse> ExecuteAsync(IRequest request);
-    }
+		abstract public Task<IResponse> ExecuteAsync(IRequest request);
+	}
 }

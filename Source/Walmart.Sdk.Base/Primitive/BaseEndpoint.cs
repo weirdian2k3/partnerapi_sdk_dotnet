@@ -14,11 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Walmart.Sdk.Base.Http;
-using Walmart.Sdk.Base.Primitive.Config;
 using Walmart.Sdk.Base.Serialization;
 
 namespace Walmart.Sdk.Base.Primitive
@@ -62,8 +59,8 @@ namespace Walmart.Sdk.Base.Primitive
 
 				throw ex;
 			}
-			string content = await response.GetPayloadAsString();
-			var serializer = payloadFactory.GetSerializer(config.ApiFormat);
+			var content = await response.GetPayloadAsString();
+			ISerializer serializer = payloadFactory.GetSerializer(config.ApiFormat);
 			return serializer.Deserialize<TPayload>(content);
 		}
 

@@ -14,36 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Walmart.Sdk.Base.Http;
-using Walmart.Sdk.Base.Exception;
 
 namespace Walmart.Sdk.Base.Http.Retry
 {
-    public abstract class BasePolicy: IRetryPolicy
-    {
-        public Http.Fetcher.IFetcher Fetcher;
-        protected IResponse response;
-        protected System.Exception latestException;
+	public abstract class BasePolicy : IRetryPolicy
+	{
+		public Http.Fetcher.IFetcher Fetcher;
+		protected IResponse response;
+		protected System.Exception latestException;
 
-        protected async Task<bool> ExecuteOnce(Http.Fetcher.IFetcher fetcher, IRequest request)
-        {
-            try
-            {
-                response = await fetcher.ExecuteAsync(request);
-                return true;
-            }
-            catch (Http.Exception.HttpException ex)
-            {
-                latestException = ex;
-                return false;
-            }
-        }
+		protected async Task<bool> ExecuteOnce(Http.Fetcher.IFetcher fetcher, IRequest request)
+		{
+			try
+			{
+				response = await fetcher.ExecuteAsync(request);
+				return true;
+			}
+			catch (Http.Exception.HttpException ex)
+			{
+				latestException = ex;
+				return false;
+			}
+		}
 
-        public abstract Task<IResponse> GetResponse(Http.Fetcher.IFetcher fetcher, IRequest request);
-    }
+		public abstract Task<IResponse> GetResponse(Http.Fetcher.IFetcher fetcher, IRequest request);
+	}
 }

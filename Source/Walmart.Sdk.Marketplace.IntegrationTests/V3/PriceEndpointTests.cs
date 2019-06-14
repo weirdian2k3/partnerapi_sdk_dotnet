@@ -16,39 +16,41 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.IntegrationTests.V3
 {
-    using Xunit;
-    using Walmart.Sdk.Marketplace.V3.Payload.Feed;
-    using System.Threading.Tasks;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
+	using Xunit;
 
-    public class PriceEndpointTests : BaseIntegrationTest
-    {
-        private readonly Marketplace.V3.Api.PriceEndpoint priceApi;
+	public class PriceEndpointTests : BaseIntegrationTest
+	{
+		private readonly Marketplace.V3.Api.PriceEndpoint priceApi;
 
-        public PriceEndpointTests()
-        {
-            var config = new Marketplace.ClientConfig("test", "test-key");
-            var apiClient = new Marketplace.ApiClient(config);
-            apiClient.SimulationEnabled = true;
-            priceApi = new Marketplace.V3.Api.PriceEndpoint(apiClient);
-        }
+		public PriceEndpointTests()
+		{
+			var config = new Marketplace.ClientConfig("test", "test-key");
+			var apiClient = new Marketplace.ApiClient(config)
+			{
+				SimulationEnabled = true
+			};
+			priceApi = new Marketplace.V3.Api.PriceEndpoint(apiClient);
+		}
 
-        [Fact]
-        public async Task UpdatePricesInBulk()
-        {
-            var stream = GetRequestStub("V3.requestStub.priceBulkUpdate");
-            var result = await priceApi.UpdateBulkPrices(stream);
-            Assert.IsType<FeedAcknowledgement>(result);
-            Assert.NotEmpty(result.FeedId);
-        }
+		[Fact]
+		public async Task UpdatePricesInBulk()
+		{
+			System.IO.Stream stream = GetRequestStub("V3.requestStub.priceBulkUpdate");
+			FeedAcknowledgement result = await priceApi.UpdateBulkPrices(stream);
+			Assert.IsType<FeedAcknowledgement>(result);
+			Assert.NotEmpty(result.FeedId);
+		}
 
-        [Fact]
-        public async Task UpdatePrice()
-        {
-            var stream = GetRequestStub("V3.requestStub.priceBulkUpdate");
-            var result = await priceApi.UpdatePrice(stream);
-            Assert.IsType<ItemPriceResponse>(result);
-            Assert.NotEmpty(result.Message);
-            Assert.NotEmpty(result.Sku);
-        }
-    }
+		[Fact]
+		public async Task UpdatePrice()
+		{
+			System.IO.Stream stream = GetRequestStub("V3.requestStub.priceBulkUpdate");
+			ItemPriceResponse result = await priceApi.UpdatePrice(stream);
+			Assert.IsType<ItemPriceResponse>(result);
+			Assert.NotEmpty(result.Message);
+			Assert.NotEmpty(result.Sku);
+		}
+	}
 }

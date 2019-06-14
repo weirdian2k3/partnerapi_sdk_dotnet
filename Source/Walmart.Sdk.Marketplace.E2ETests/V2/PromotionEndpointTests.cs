@@ -16,29 +16,29 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.E2ETests.V2
 {
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Marketplace.V2.Api;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
-    using Xunit;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Api;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using Xunit;
 
-    public class PromotionEndpointTests : BaseE2ETest
-    {
-        private readonly PromotionEndpoint promotionApi;
+	public class PromotionEndpointTests : BaseE2ETest
+	{
+		private readonly PromotionEndpoint promotionApi;
 
-        public PromotionEndpointTests()
-        {
-            promotionApi = new PromotionEndpoint(client);
-        }
+		public PromotionEndpointTests()
+		{
+			promotionApi = new PromotionEndpoint(client);
+		}
 
-        [Fact]
-        public async Task UpdatingPromotionsInBulk()
-        {
-            using (var stream = LoadRequestStub("V2.requestStub.promotionFeed"))
-            {
-                var result = await promotionApi.UpdatePromotionPricesInBulk(stream);
-                Assert.IsType<FeedAcknowledgement>(result);
-                Assert.True(result.FeedId.Length > 0);
-            }
-        }
-    }
+		[Fact]
+		public async Task UpdatingPromotionsInBulk()
+		{
+			using (System.IO.Stream stream = LoadRequestStub("V2.requestStub.promotionFeed"))
+			{
+				FeedAcknowledgement result = await promotionApi.UpdatePromotionPricesInBulk(stream);
+				Assert.IsType<FeedAcknowledgement>(result);
+				Assert.True(result.FeedId.Length > 0);
+			}
+		}
+	}
 }

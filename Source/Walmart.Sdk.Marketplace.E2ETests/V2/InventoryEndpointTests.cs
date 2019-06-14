@@ -16,59 +16,59 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.E2ETests.V2
 {
-    using System.IO;
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Marketplace.V2.Api;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
-    using Walmart.Sdk.Marketplace.V2.Payload.Inventory;
-    using Xunit;
+	using System.IO;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Api;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using Walmart.Sdk.Marketplace.V2.Payload.Inventory;
+	using Xunit;
 
-    public class InventoryEndpointTests : BaseE2ETest
-    {
-        const string TEST_SKU = "NETSDK_TEST";
+	public class InventoryEndpointTests : BaseE2ETest
+	{
+		const string TEST_SKU = "NETSDK_TEST";
 
-        private readonly InventoryEndpoint inventoryApi;
+		private readonly InventoryEndpoint inventoryApi;
 
-        public InventoryEndpointTests()
-        {
-            inventoryApi = new InventoryEndpoint(client);
-        }
+		public InventoryEndpointTests()
+		{
+			inventoryApi = new InventoryEndpoint(client);
+		}
 
-        [Fact]
-        public async Task GetInventory()
-        {
-            var inventory = await inventoryApi.GetInventory(TEST_SKU);
-            Assert.True(inventory.Sku.Length > 0);
-            Assert.True(inventory.Quantity.Amount >= 0);
-        }
+		[Fact]
+		public async Task GetInventory()
+		{
+			Inventory inventory = await inventoryApi.GetInventory(TEST_SKU);
+			Assert.True(inventory.Sku.Length > 0);
+			Assert.True(inventory.Quantity.Amount >= 0);
+		}
 
-        [Fact]
-        public async Task UpdateInventoryWithStream()
-        {
-            var inventoryPayload = LoadRequestStub("V2.requestStub.inventoryUpdate");
-            var update = await inventoryApi.UpdateInventory(TEST_SKU, inventoryPayload);
-            Assert.IsType<Inventory>(update);
-            Assert.True(update.Sku.Length > 0);
-            Assert.True(update.Quantity.Amount >= 0);
-        }
+		[Fact]
+		public async Task UpdateInventoryWithStream()
+		{
+			Stream inventoryPayload = LoadRequestStub("V2.requestStub.inventoryUpdate");
+			Inventory update = await inventoryApi.UpdateInventory(TEST_SKU, inventoryPayload);
+			Assert.IsType<Inventory>(update);
+			Assert.True(update.Sku.Length > 0);
+			Assert.True(update.Quantity.Amount >= 0);
+		}
 
-        [Fact]
-        public async Task UpdateInventoryWithString()
-        {
-            var inventoryPayload = LoadRequestStub("V2.requestStub.inventoryUpdate");
-            var content = (new StreamReader(inventoryPayload)).ReadToEnd();
-            var update = await inventoryApi.UpdateInventory(TEST_SKU, content);
-            Assert.True(update.Sku.Length > 0);
-            Assert.True(update.Quantity.Amount >= 0);
-        }
+		[Fact]
+		public async Task UpdateInventoryWithString()
+		{
+			Stream inventoryPayload = LoadRequestStub("V2.requestStub.inventoryUpdate");
+			var content = (new StreamReader(inventoryPayload)).ReadToEnd();
+			Inventory update = await inventoryApi.UpdateInventory(TEST_SKU, content);
+			Assert.True(update.Sku.Length > 0);
+			Assert.True(update.Quantity.Amount >= 0);
+		}
 
-        [Fact]
-        public async Task InventoryBulkUpdate()
-        {
-            var inventoryPayload = LoadRequestStub("V2.requestStub.inventoryBulkUpdate");
-            var result = await inventoryApi.UpdateBulkInventory(inventoryPayload);
-            Assert.IsType<FeedAcknowledgement>(result);
-            Assert.True(result.FeedId.Length > 0);
-        }
-    }
+		[Fact]
+		public async Task InventoryBulkUpdate()
+		{
+			Stream inventoryPayload = LoadRequestStub("V2.requestStub.inventoryBulkUpdate");
+			FeedAcknowledgement result = await inventoryApi.UpdateBulkInventory(inventoryPayload);
+			Assert.IsType<FeedAcknowledgement>(result);
+			Assert.True(result.FeedId.Length > 0);
+		}
+	}
 }

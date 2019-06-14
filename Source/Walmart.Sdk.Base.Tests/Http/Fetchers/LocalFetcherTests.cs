@@ -14,132 +14,132 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using Xunit;
-using Moq;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Moq;
 using Walmart.Sdk.Base.Http;
 using Walmart.Sdk.Base.Primitive;
-using System.Net.Http;
+using Xunit;
 
 namespace Walmart.Sdk.Base.Test.Http
 {
-    public class LocalFetcherTests
-    {
-        public const string MOCK_FOLDER = "/Http/Fetchers/LocalFetcherMocks/";
-        public Primitive.Config.IHttpConfig config;
-        public LocalFetcherTests()
-        {
-            config = new Primitive.BaseConfig("test", "test-key");
-        }
+	public class LocalFetcherTests
+	{
+		public const string MOCK_FOLDER = "/Http/Fetchers/LocalFetcherMocks/";
+		public Primitive.Config.IHttpConfig config;
+		public LocalFetcherTests()
+		{
+			config = new Primitive.BaseConfig("test", "test-key");
+		}
 
-        [Fact]
-        public void DefaultMappingLoadingFineFromAssembly()
-        {
-            var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
-            Assert.False(fakeFetcher is null);
-        }
+		[Fact]
+		public void DefaultMappingLoadingFineFromAssembly()
+		{
+			var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
+			Assert.False(fakeFetcher is null);
+		}
 
-        [Fact]
-        public async Task CanSetCustomFolderAndJSONOutputForMocks()
-        {
-            var fullDir = Directory.GetCurrentDirectory() + MOCK_FOLDER;
-            config.ApiFormat = ApiFormat.JSON; 
+		[Fact]
+		public async Task CanSetCustomFolderAndJSONOutputForMocks()
+		{
+			var fullDir = Directory.GetCurrentDirectory() + MOCK_FOLDER;
+			config.ApiFormat = ApiFormat.JSON;
 
-            var request = new Mock<Base.Http.IRequest>();
-            request.Setup(t => t.Method).Returns(HttpMethod.Get);
-            request.Setup(t => t.EndpointUri).Returns("/feeds");
-
-
-            var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
-            fakeFetcher.SetCustomMockFolder(fullDir);
-
-            var result = await fakeFetcher.ExecuteAsync(request.Object);
-
-            Assert.IsType<Response>(result);
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal(
-                "{\"custom\": \"folder\"}",
-                await result.GetPayloadAsString()
-            );
-        }
-
-        [Fact]
-        public async Task CanSetCustomFolderAndXMLOutputForMocks()
-        {
-            var fullDir = Directory.GetCurrentDirectory() + MOCK_FOLDER;
-
-            var request = new Mock<Base.Http.IRequest>();
-            request.Setup(t => t.Method).Returns(HttpMethod.Get);
-            request.Setup(t => t.EndpointUri).Returns("/feeds");
+			var request = new Mock<Base.Http.IRequest>();
+			request.Setup(t => t.Method).Returns(HttpMethod.Get);
+			request.Setup(t => t.EndpointUri).Returns("/feeds");
 
 
-            var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
-            fakeFetcher.SetCustomMockFolder(fullDir);
+			var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
+			fakeFetcher.SetCustomMockFolder(fullDir);
 
-            var result = await fakeFetcher.ExecuteAsync(request.Object);
+			IResponse result = await fakeFetcher.ExecuteAsync(request.Object);
 
-            Assert.IsType<Response>(result);
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal(
-                "<xml>custom mock folder</xml>",
-                await result.GetPayloadAsString()
-            );
-        }
+			Assert.IsType<Response>(result);
+			Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+			Assert.Equal(
+			    "{\"custom\": \"folder\"}",
+			    await result.GetPayloadAsString()
+			);
+		}
 
-        [Fact]
-        public void UsingWrongFolderIsNoGood()
-        {
-            var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
-            Assert.Throws<Base.Exception.InitException>( 
-                () => fakeFetcher.SetCustomMockFolder("WRONG-FOLDER")
-            );
-        }
+		[Fact]
+		public async Task CanSetCustomFolderAndXMLOutputForMocks()
+		{
+			var fullDir = Directory.GetCurrentDirectory() + MOCK_FOLDER;
 
-        [Fact]
-        public void UsingValidFolderWithoutMappingFileIsStillNoGood()
-        {
-           
+			var request = new Mock<Base.Http.IRequest>();
+			request.Setup(t => t.Method).Returns(HttpMethod.Get);
+			request.Setup(t => t.EndpointUri).Returns("/feeds");
 
-            var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
-            Assert.Throws<Base.Exception.InitException>(
-                () => fakeFetcher.SetCustomMockFolder(Directory.GetCurrentDirectory())
-            );
-        }
 
-        [Fact]
-        public void RequestingCustomPayloadMissingInMappingNoGood()
-        {
-            var fullDir = Directory.GetCurrentDirectory() + MOCK_FOLDER;
+			var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
+			fakeFetcher.SetCustomMockFolder(fullDir);
 
-            var request = new Mock<Base.Http.IRequest>();
-            request.Setup(t => t.Method).Returns(HttpMethod.Get);
-            request.Setup(t => t.EndpointUri).Returns("/invalid-get-request");
+			IResponse result = await fakeFetcher.ExecuteAsync(request.Object);
 
-            var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
-            fakeFetcher.SetCustomMockFolder(fullDir);
+			Assert.IsType<Response>(result);
+			Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+			Assert.Equal(
+			    "<xml>custom mock folder</xml>",
+			    await result.GetPayloadAsString()
+			);
+		}
 
-            Assert.ThrowsAsync<Base.Http.Exception.GatewayException>(
-                () => fakeFetcher.ExecuteAsync(request.Object)
-            );
-        }
+		[Fact]
+		public void UsingWrongFolderIsNoGood()
+		{
+			var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
+			Assert.Throws<Base.Exception.InitException>(
+			    () => fakeFetcher.SetCustomMockFolder("WRONG-FOLDER")
+			);
+		}
 
-        [Fact]
-        public void RequestingDefaultPayloadMissingInMappingNoGood()
-        {
-            var fullDir = Directory.GetCurrentDirectory() + MOCK_FOLDER;
+		[Fact]
+		public void UsingValidFolderWithoutMappingFileIsStillNoGood()
+		{
 
-            var request = new Mock<Base.Http.IRequest>();
-            request.Setup(t => t.Method).Returns(HttpMethod.Get);
-            request.Setup(t => t.EndpointUri).Returns("/invalid-get-request");
 
-            var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
+			var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
+			Assert.Throws<Base.Exception.InitException>(
+			    () => fakeFetcher.SetCustomMockFolder(Directory.GetCurrentDirectory())
+			);
+		}
 
-            Assert.ThrowsAsync<Base.Http.Exception.GatewayException>(
-                () => fakeFetcher.ExecuteAsync(request.Object)
-            );
-        }
+		[Fact]
+		public void RequestingCustomPayloadMissingInMappingNoGood()
+		{
+			var fullDir = Directory.GetCurrentDirectory() + MOCK_FOLDER;
 
-    }
+			var request = new Mock<Base.Http.IRequest>();
+			request.Setup(t => t.Method).Returns(HttpMethod.Get);
+			request.Setup(t => t.EndpointUri).Returns("/invalid-get-request");
+
+			var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
+			fakeFetcher.SetCustomMockFolder(fullDir);
+
+			Assert.ThrowsAsync<Base.Http.Exception.GatewayException>(
+			    () => fakeFetcher.ExecuteAsync(request.Object)
+			);
+		}
+
+		[Fact]
+		public void RequestingDefaultPayloadMissingInMappingNoGood()
+		{
+			var fullDir = Directory.GetCurrentDirectory() + MOCK_FOLDER;
+
+			var request = new Mock<Base.Http.IRequest>();
+			request.Setup(t => t.Method).Returns(HttpMethod.Get);
+			request.Setup(t => t.EndpointUri).Returns("/invalid-get-request");
+
+			var fakeFetcher = new Base.Http.Fetcher.LocalFetcher(config);
+
+			Assert.ThrowsAsync<Base.Http.Exception.GatewayException>(
+			    () => fakeFetcher.ExecuteAsync(request.Object)
+			);
+		}
+
+	}
 }

@@ -16,41 +16,36 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V2.Api
 {
-    using System.IO;
-    using System.Collections.Generic;
-    using System.Text;
-    using Walmart.Sdk.Base;
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Marketplace.V2;
-    using Walmart.Sdk.Marketplace.V2.Payload;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
-    using Walmart.Sdk.Marketplace.V2.Payload.Promotion;
-    using Walmart.Sdk.Marketplace.V2.Payload.LagTime;
-    
-    public class LagTimeEndpoint : Base.Primitive.BaseEndpoint
-    {
-        protected FeedEndpoint feedApi;
+	using System.IO;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Payload;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using Walmart.Sdk.Marketplace.V2.Payload.LagTime;
 
-        public LagTimeEndpoint(Base.Primitive.IEndpointClient apiClient) : base(apiClient)
-        {
-            feedApi = new FeedEndpoint(apiClient);
-            payloadFactory = new V2.Payload.PayloadFactory();
-        }
+	public class LagTimeEndpoint : Base.Primitive.BaseEndpoint
+	{
+		protected FeedEndpoint feedApi;
 
-        public async Task<LagTime> GetLagTime(string merchantSku)
-        {
-            var request = CreateRequest();
-            request.EndpointUri = string.Format("/v2/lagtime?sku={0}", merchantSku);
-            var response = await client.GetAsync(request);
+		public LagTimeEndpoint(Base.Primitive.IEndpointClient apiClient) : base(apiClient)
+		{
+			feedApi = new FeedEndpoint(apiClient);
+			payloadFactory = new V2.Payload.PayloadFactory();
+		}
 
-            LagTime result = await ProcessResponse<LagTime>(response);
+		public async Task<LagTime> GetLagTime(string merchantSku)
+		{
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = string.Format("/v2/lagtime?sku={0}", merchantSku);
+			Base.Http.IResponse response = await client.GetAsync(request);
 
-            return result;
-        }
+			LagTime result = await ProcessResponse<LagTime>(response);
 
-        public async Task<FeedAcknowledgement> UpdateLagTime(Stream stream)
-        {
-            return await feedApi.UploadFeed(stream, FeedType.lagtime);
-        }
-    }
+			return result;
+		}
+
+		public async Task<FeedAcknowledgement> UpdateLagTime(Stream stream)
+		{
+			return await feedApi.UploadFeed(stream, FeedType.lagtime);
+		}
+	}
 }

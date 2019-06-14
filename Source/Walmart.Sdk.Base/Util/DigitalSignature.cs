@@ -19,37 +19,38 @@ using System.Text;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
-using Walmart.Sdk.Base;
-using Walmart.Sdk.Base.Primitive;
 
 namespace Walmart.Sdk.Base.Util
 {
-    /// <summary>
-    /// Util class for calculating the Digital Authentication Signature
-    /// </summary>
-    public static class DigitalSignature
-    {
-        public static string GetCurrentTimestamp()
-        {
-            TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            return ((long)t.TotalMilliseconds).ToString();
-        }
+	/// <summary>
+	/// Util class for calculating the Digital Authentication Signature
+	/// </summary>
+	public static class DigitalSignature
+	{
+		public static string GetCurrentTimestamp()
+		{
+			TimeSpan t = DateTime.UtcNow - new DateTime(1970, 1, 1);
+			return ((long)t.TotalMilliseconds).ToString();
+		}
 
-        public static string GetCorrelationId() => Guid.NewGuid().ToString();
+		public static string GetCorrelationId()
+		{
+			return Guid.NewGuid().ToString();
+		}
 
-        internal static string SignData(string stringToBeSigned, string privateKey)
-        {
-            byte[] encodedKeyBytes = Convert.FromBase64String(privateKey);
-            byte[] data = Encoding.UTF8.GetBytes(stringToBeSigned);
+		internal static string SignData(string stringToBeSigned, string privateKey)
+		{
+			var encodedKeyBytes = Convert.FromBase64String(privateKey);
+			var data = Encoding.UTF8.GetBytes(stringToBeSigned);
 
-            AsymmetricKeyParameter asymmetricKeyParameter = PrivateKeyFactory.CreateKey(encodedKeyBytes);
-            RsaKeyParameters rsaKeyParameters = (RsaKeyParameters)asymmetricKeyParameter;
-            ISigner signer = SignerUtilities.GetSigner("SHA-256withRSA");
-            signer.Init(true, rsaKeyParameters);
-            var stringToSignInBytes = Encoding.UTF8.GetBytes(stringToBeSigned);
-            signer.BlockUpdate(stringToSignInBytes, 0, stringToSignInBytes.Length);
-            var signature = signer.GenerateSignature();
-            return Convert.ToBase64String(signature);
-        }
-    }
+			AsymmetricKeyParameter asymmetricKeyParameter = PrivateKeyFactory.CreateKey(encodedKeyBytes);
+			var rsaKeyParameters = (RsaKeyParameters)asymmetricKeyParameter;
+			ISigner signer = SignerUtilities.GetSigner("SHA-256withRSA");
+			signer.Init(true, rsaKeyParameters);
+			var stringToSignInBytes = Encoding.UTF8.GetBytes(stringToBeSigned);
+			signer.BlockUpdate(stringToSignInBytes, 0, stringToSignInBytes.Length);
+			var signature = signer.GenerateSignature();
+			return Convert.ToBase64String(signature);
+		}
+	}
 }

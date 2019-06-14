@@ -14,23 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using Xunit;
-using Walmart.Sdk.Base.Primitive;
-using Walmart.Sdk.Base.Primitive.Config;
-using Walmart.Sdk.Marketplace.V3.Api;
-using Walmart.Sdk.Marketplace.V3.Payload;
-using Walmart.Sdk.Marketplace.V3.Payload.Feed;
-using System.IO;
-
 namespace Walmart.Sdk.Marketplace.IntegrationTests.V3
 {
-    public class InventoryEndpointTests : BaseIntegrationTest
-    {
-        public InventoryEndpointTests()
-        {
-            
-        }
+	public class InventoryEndpointTests : BaseIntegrationTest
+	{
+		public InventoryEndpointTests()
+		{
 
-        // no inventory endpoints exists in V3
-    }
+		}
+
+		// no inventory endpoints exists in V3
+	}
 }

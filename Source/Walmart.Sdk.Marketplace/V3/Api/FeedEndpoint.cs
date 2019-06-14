@@ -16,67 +16,84 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V3.Api
 {
-    using System;
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Base.Primitive;
-    using Walmart.Sdk.Marketplace.V3.Payload.Feed;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Base.Primitive;
+	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
 
-    public class FeedEndpoint: Base.Primitive.BaseEndpoint
-    {
-        public FeedEndpoint(Base.Primitive.IEndpointClient apiClient) : base(apiClient)
-        {
-            payloadFactory = new V3.Payload.PayloadFactory();
-        }
+	public class FeedEndpoint : Base.Primitive.BaseEndpoint
+	{
+		public FeedEndpoint(Base.Primitive.IEndpointClient apiClient) : base(apiClient)
+		{
+			payloadFactory = new V3.Payload.PayloadFactory();
+		}
 
-        public async Task<PartnerFeedResponse> GetFeedStatus(string feedId, bool includeDetails = false, int offset = 0, int limit = 0)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<PartnerFeedResponse> GetFeedStatus(string feedId, bool includeDetails = false, int offset = 0, int limit = 0)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var request = CreateRequest();
-            request.EndpointUri = string.Format("/v3/feeds/{0}", feedId);
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = string.Format("/v3/feeds/{0}", feedId);
 
-            // by default it's false and we don't need to send it
-            if (includeDetails) request.QueryParams.Add("includeDetails", "true"); 
-            if (offset > 0) request.QueryParams.Add("offset", offset.ToString());
-            if (limit > 0) request.QueryParams.Add("limit", limit.ToString());
+			// by default it's false and we don't need to send it
+			if (includeDetails)
+			{
+				request.QueryParams.Add("includeDetails", "true");
+			}
 
-            var response = await client.GetAsync(request);
-            var result = await ProcessResponse<PartnerFeedResponse>(response);
-            return result;
-        }
+			if (offset > 0)
+			{
+				request.QueryParams.Add("offset", offset.ToString());
+			}
 
-        public async Task<FeedRecordResponse> GetAllFeedStatuses(int offset = 0, int limit = 10)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+			if (limit > 0)
+			{
+				request.QueryParams.Add("limit", limit.ToString());
+			}
 
-            var request = CreateRequest();
-            request.EndpointUri = "/v3/feeds";
+			Base.Http.IResponse response = await client.GetAsync(request);
+			PartnerFeedResponse result = await ProcessResponse<PartnerFeedResponse>(response);
+			return result;
+		}
 
-            if (offset > 0) request.QueryParams.Add("offset", offset.ToString());
-            if (limit > 0) request.QueryParams.Add("limit", limit.ToString());
+		public async Task<FeedRecordResponse> GetAllFeedStatuses(int offset = 0, int limit = 10)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var response = await client.GetAsync(request);
-            FeedRecordResponse result = await ProcessResponse<FeedRecordResponse>(response);
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = "/v3/feeds";
 
-            return result;
-        }
+			if (offset > 0)
+			{
+				request.QueryParams.Add("offset", offset.ToString());
+			}
 
-        public async Task<FeedAcknowledgement> UploadFeed(System.IO.Stream file, V3.Payload.FeedType feedType)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+			if (limit > 0)
+			{
+				request.QueryParams.Add("limit", limit.ToString());
+			}
 
-            var request = CreateRequest();
-            request.EndpointUri = "/v3/feeds";
+			Base.Http.IResponse response = await client.GetAsync(request);
+			FeedRecordResponse result = await ProcessResponse<FeedRecordResponse>(response);
 
-            request.QueryParams.Add("feedType", feedType.ToString());
-            request.AddMultipartContent(file);
+			return result;
+		}
 
-            var response = await client.PostAsync(request);
-            var result = await ProcessResponse<FeedAcknowledgement>(response);
-            return result;
-        }
-    }
+		public async Task<FeedAcknowledgement> UploadFeed(System.IO.Stream file, V3.Payload.FeedType feedType)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
+
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = "/v3/feeds";
+
+			request.QueryParams.Add("feedType", feedType.ToString());
+			request.AddMultipartContent(file);
+
+			Base.Http.IResponse response = await client.PostAsync(request);
+			FeedAcknowledgement result = await ProcessResponse<FeedAcknowledgement>(response);
+			return result;
+		}
+	}
 }

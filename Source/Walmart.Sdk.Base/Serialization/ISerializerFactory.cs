@@ -14,15 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Walmart.Sdk.Base.Primitive;
 
 namespace Walmart.Sdk.Base.Serialization
 {
-    public interface ISerializerFactory
-    {
-        ISerializer GetSerializer(ApiFormat format);
-    }
+	public interface ISerializerFactory
+	{
+		ISerializer GetSerializer(ApiFormat format);
+	}
 }

@@ -17,14 +17,12 @@ limitations under the License.
 namespace Walmart.Sdk.Marketplace.V3.Api
 {
 	using System;
+	using System.IO;
 	using System.Threading.Tasks;
 	using Walmart.Sdk.Base.Http;
-	using Walmart.Sdk.Marketplace.V3.Payload.Return;
 	using Walmart.Sdk.Base.Primitive;
-	using Walmart.Sdk.Marketplace.V3.Api.Request;
-	using Walmart.Sdk.Base.Serialization;
 	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
-	using System.IO;
+	using Walmart.Sdk.Marketplace.V3.Payload.Return;
 
 	public class ReturnEndpoint : BaseEndpoint
 	{
@@ -74,17 +72,31 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			// to avoid deadlock if this method is executed synchronously
 			await new ContextRemover();
 
-			var request = CreateRequest();
+			Base.Http.Request request = CreateRequest();
 
 			request.EndpointUri = "/v3/returns";
 
-			if (limit < 1) limit = 1;
-			if (limit > 200) limit = 200;
+			if (limit < 1)
+			{
+				limit = 1;
+			}
+
+			if (limit > 200)
+			{
+				limit = 200;
+			}
 
 			request.QueryParams.Add("limit", limit.ToString());
 
-			if (!string.IsNullOrWhiteSpace(returnOrderId)) request.QueryParams.Add("returnOrderId", returnOrderId.ToString());
-			if (!string.IsNullOrWhiteSpace(customerOrderId)) request.QueryParams.Add("customerOrderId", customerOrderId.ToString());
+			if (!string.IsNullOrWhiteSpace(returnOrderId))
+			{
+				request.QueryParams.Add("returnOrderId", returnOrderId.ToString());
+			}
+
+			if (!string.IsNullOrWhiteSpace(customerOrderId))
+			{
+				request.QueryParams.Add("customerOrderId", customerOrderId.ToString());
+			}
 
 			if (returnCreationStartDate.HasValue &&
 				returnCreationEndDate.HasValue)
@@ -102,13 +114,13 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			{
 				if (!string.IsNullOrWhiteSpace(nextCursor))
 				{
-					request.EndpointUri = String.Format("/v3/returns/{0}", nextCursor);
+					request.EndpointUri = string.Format("/v3/returns/{0}", nextCursor);
 				}
 			}
 
-			var response = await client.GetAsync(request);
+			IResponse response = await client.GetAsync(request);
 
-			var result = await ProcessResponse<ReturnsListType>(response);
+			ReturnsListType result = await ProcessResponse<ReturnsListType>(response);
 			return result;
 		}
 
@@ -117,13 +129,13 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			// to avoid deadlock if this method is executed synchronously
 			await new ContextRemover();
 
-			var request = CreateRequest();
+			Base.Http.Request request = CreateRequest();
 
-			request.EndpointUri = String.Format("/v3/returns/{0}/refund", returnOrderId);
+			request.EndpointUri = string.Format("/v3/returns/{0}/refund", returnOrderId);
 			request.AddPayload(GetSerializer().Serialize(refundRequest));
 
-			var response = await client.PostAsync(request);
-			var result = await ProcessResponse<RefundResponse>(response);
+			IResponse response = await client.PostAsync(request);
+			RefundResponse result = await ProcessResponse<RefundResponse>(response);
 			return result;
 		}
 

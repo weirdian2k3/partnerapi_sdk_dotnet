@@ -15,41 +15,35 @@ limitations under the License.
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Walmart.Sdk.Base.Exception;
-using Walmart.Sdk.Base.Primitive;
 using Walmart.Sdk.Base.Http;
-using Walmart.Sdk.Marketplace.V2.Api.Exception;
+using Walmart.Sdk.Base.Primitive;
 using ApiException = Walmart.Sdk.Marketplace.V2.Api.Exception.ApiException;
 
 namespace Walmart.Sdk.Marketplace.V2.Payload
 {
-    public class PayloadFactory: Base.Primitive.BasePayloadFactory
-    {
-        public override System.Exception CreateApiException(ApiFormat format, string content, IResponse response)
-        {
-            try
-            {
-                var errors = GetSerializer(format).Deserialize<V2.Payload.Feed.Errors>(content);
-                return ApiException.Factory(errors, response);
-            }
-            catch (Exception firstAttemptEx)
-            {
-                try
-                {
-                    var errors = GetSerializer(format).Deserialize<V2.Payload.Feed.ErrorsWithoutNS>(content);
-                    return ApiException.Factory(errors, response);
-                }
-                catch (Exception secondAttempEx)
-                {
-                    var exceptionList = new Exception[] { firstAttemptEx, secondAttempEx };
-                    var aggrEx = new AggregateException("Unable to parse error response >" + content + "<", exceptionList);
-                    throw aggrEx;
-                }
-            }
-        }
-    }
+	public class PayloadFactory : Base.Primitive.BasePayloadFactory
+	{
+		public override System.Exception CreateApiException(ApiFormat format, string content, IResponse response)
+		{
+			try
+			{
+				Feed.Errors errors = GetSerializer(format).Deserialize<V2.Payload.Feed.Errors>(content);
+				return ApiException.Factory(errors, response);
+			}
+			catch (Exception firstAttemptEx)
+			{
+				try
+				{
+					Feed.ErrorsWithoutNS errors = GetSerializer(format).Deserialize<V2.Payload.Feed.ErrorsWithoutNS>(content);
+					return ApiException.Factory(errors, response);
+				}
+				catch (Exception secondAttempEx)
+				{
+					var exceptionList = new Exception[] { firstAttemptEx, secondAttempEx };
+					var aggrEx = new AggregateException("Unable to parse error response >" + content + "<", exceptionList);
+					throw aggrEx;
+				}
+			}
+		}
+	}
 }

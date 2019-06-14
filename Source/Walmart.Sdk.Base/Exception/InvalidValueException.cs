@@ -14,19 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Walmart.Sdk.Base.Exception
 {
-    public class InvalidValueException: System.Exception
-    {
-        public InvalidValueException(string message) : base(message)
-        {
-        }
-        public InvalidValueException(string message, System.Exception exception) : base(message, exception)
-        {
-        }
-    }
+	public class InvalidValueException : System.Exception
+	{
+		public InvalidValueException(string message) : base(message)
+		{
+		}
+		public InvalidValueException(string message, System.Exception exception) : base(message, exception)
+		{
+		}
+	}
 }

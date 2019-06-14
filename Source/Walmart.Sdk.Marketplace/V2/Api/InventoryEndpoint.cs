@@ -16,93 +16,93 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V2.Api
 {
-    using System.IO;
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Base.Primitive;
-    using Walmart.Sdk.Marketplace.V2.Payload.Inventory;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using System.IO;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Base.Primitive;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using Walmart.Sdk.Marketplace.V2.Payload.Inventory;
 
-    public class InventoryEndpoint: BaseEndpoint
-    {
-        private FeedEndpoint feedApi;
+	public class InventoryEndpoint : BaseEndpoint
+	{
+		private FeedEndpoint feedApi;
 
-        public InventoryEndpoint(IEndpointClient client) : base(client)
-        {
-            feedApi = new FeedEndpoint(apiClient);
-            payloadFactory = new Payload.PayloadFactory();
-        }
+		public InventoryEndpoint(IEndpointClient client) : base(client)
+		{
+			feedApi = new FeedEndpoint(apiClient);
+			payloadFactory = new Payload.PayloadFactory();
+		}
 
-        public async Task<Inventory> GetInventory(string merchantSku)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<Inventory> GetInventory(string merchantSku)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var request = CreateRequest();
-            request.EndpointUri = "/v2/inventory";
-            request.QueryParams.Add("sku", merchantSku);
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = "/v2/inventory";
+			request.QueryParams.Add("sku", merchantSku);
 
-            var response = await client.GetAsync(request);
-            Inventory result = await ProcessResponse<Inventory>(response);
-            return result;
-        }
+			Base.Http.IResponse response = await client.GetAsync(request);
+			Inventory result = await ProcessResponse<Inventory>(response);
+			return result;
+		}
 
-        private Base.Http.Request PrepareUpdateInventoryRequest(string merchantSku, string content)
-        {
-            if (string.IsNullOrEmpty(merchantSku))
-            {
-                throw new Base.Exception.InvalidValueException("Sku can't be empty for inventory update!");
-            }
+		private Base.Http.Request PrepareUpdateInventoryRequest(string merchantSku, string content)
+		{
+			if (string.IsNullOrEmpty(merchantSku))
+			{
+				throw new Base.Exception.InvalidValueException("Sku can't be empty for inventory update!");
+			}
 
-            var request = CreateRequest();
-            request.EndpointUri = "/v2/inventory";
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = "/v2/inventory";
 
-            request.AddPayload(content);
-            request.QueryParams.Add("sku", merchantSku);
-            return request;
-        }
+			request.AddPayload(content);
+			request.QueryParams.Add("sku", merchantSku);
+			return request;
+		}
 
-        public async Task<Inventory> UpdateInventory(Inventory inventory)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<Inventory> UpdateInventory(Inventory inventory)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            // enforce XML serializer here, API doesn't support JSON in requests
-            var content = payloadFactory.GetSerializer(ApiFormat.XML).Serialize<Inventory>(inventory);
-            var request = PrepareUpdateInventoryRequest(inventory.Sku, content);
+			// enforce XML serializer here, API doesn't support JSON in requests
+			var content = payloadFactory.GetSerializer(ApiFormat.XML).Serialize<Inventory>(inventory);
+			Base.Http.Request request = PrepareUpdateInventoryRequest(inventory.Sku, content);
 
-            var response = await client.PutAsync(request);
-            var result = await ProcessResponse<Inventory>(response);
-            return result;
-        }
+			Base.Http.IResponse response = await client.PutAsync(request);
+			Inventory result = await ProcessResponse<Inventory>(response);
+			return result;
+		}
 
-        public async Task<Inventory> UpdateInventory(string merchantSku, System.IO.Stream stream)
-        {
-            // avoiding deadlock if client execute this method synchronously
-            await new ContextRemover();
+		public async Task<Inventory> UpdateInventory(string merchantSku, System.IO.Stream stream)
+		{
+			// avoiding deadlock if client execute this method synchronously
+			await new ContextRemover();
 
-            var content = new StreamReader(stream).ReadToEnd();
-            var request = PrepareUpdateInventoryRequest(merchantSku, content);
+			var content = new StreamReader(stream).ReadToEnd();
+			Base.Http.Request request = PrepareUpdateInventoryRequest(merchantSku, content);
 
-            var response = await client.PutAsync(request);
-            var result = await ProcessResponse<Inventory>(response);
-            return result;
-        }
-        
-        public async Task<Inventory> UpdateInventory(string merchantSku, string bodyContent)
-        {
-            // avoiding deadlock if client execute this method synchronously
-            await new ContextRemover();
+			Base.Http.IResponse response = await client.PutAsync(request);
+			Inventory result = await ProcessResponse<Inventory>(response);
+			return result;
+		}
 
-            var request = PrepareUpdateInventoryRequest(merchantSku, bodyContent);
+		public async Task<Inventory> UpdateInventory(string merchantSku, string bodyContent)
+		{
+			// avoiding deadlock if client execute this method synchronously
+			await new ContextRemover();
 
-            var response = await client.PutAsync(request);
-            var result = await ProcessResponse<Inventory>(response);
-            return result;
-        }
+			Base.Http.Request request = PrepareUpdateInventoryRequest(merchantSku, bodyContent);
 
-        public async Task<FeedAcknowledgement> UpdateBulkInventory(System.IO.Stream stream)
-        {
-            return await feedApi.UploadFeed(stream, V2.Payload.FeedType.inventory);
-        }
-    }
+			Base.Http.IResponse response = await client.PutAsync(request);
+			Inventory result = await ProcessResponse<Inventory>(response);
+			return result;
+		}
+
+		public async Task<FeedAcknowledgement> UpdateBulkInventory(System.IO.Stream stream)
+		{
+			return await feedApi.UploadFeed(stream, V2.Payload.FeedType.inventory);
+		}
+	}
 }

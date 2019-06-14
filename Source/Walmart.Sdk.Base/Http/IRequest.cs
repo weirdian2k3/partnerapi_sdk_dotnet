@@ -14,19 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 
 namespace Walmart.Sdk.Base.Http
 {
-    public interface IRequest
-    {
-        string EndpointUri { get; }
-        HttpRequestMessage HttpRequest { get; }
-        void FinalizePreparation();
-        HttpMethod Method { get; set; }
-        string BuildQueryParams();
-    }
+	public interface IRequest
+	{
+		string EndpointUri { get; }
+		HttpRequestMessage HttpRequest { get; }
+		void FinalizePreparation();
+		HttpMethod Method { get; set; }
+		string BuildQueryParams();
+	}
 }

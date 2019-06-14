@@ -14,38 +14,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-
 namespace Walmart.Sdk.Base.Http.Fetcher
 {
-    // in this class we are making sure 
-    // we only creating one HttpClient and LocalClient 
-    // for each instance of HttpHandler
-    public class FetcherFactory: IFetcherFactory
-    {
-        private LocalFetcher localFetcher;
-        private HttpFetcher httpFetcher;
+	// in this class we are making sure 
+	// we only creating one HttpClient and LocalClient 
+	// for each instance of HttpHandler
+	public class FetcherFactory : IFetcherFactory
+	{
+		private LocalFetcher localFetcher;
+		private HttpFetcher httpFetcher;
 
-        public IFetcher CreateFetcher(bool fakeFetcher, Primitive.Config.IHttpConfig config)
-        {
-            if (fakeFetcher)
-            {
-                if (localFetcher is null)
-                    localFetcher = new LocalFetcher(config);
-                return localFetcher;
-            }
-            else
-            {
-                if (httpFetcher is null)
-                {
-                    var client = new HttpClientWrapper();
-                    httpFetcher = new HttpFetcher(config, client);
-                }
-                return httpFetcher;
-            }
-        }
-    }
+		public IFetcher CreateFetcher(bool fakeFetcher, Primitive.Config.IHttpConfig config)
+		{
+			if (fakeFetcher)
+			{
+				if (localFetcher is null)
+				{
+					localFetcher = new LocalFetcher(config);
+				}
+
+				return localFetcher;
+			}
+			else
+			{
+				if (httpFetcher is null)
+				{
+					var client = new HttpClientWrapper();
+					httpFetcher = new HttpFetcher(config, client);
+				}
+				return httpFetcher;
+			}
+		}
+	}
 }

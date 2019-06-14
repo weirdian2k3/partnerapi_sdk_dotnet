@@ -14,18 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Walmart.Sdk.Base.Primitive;
-using Walmart.Sdk.Marketplace.V3.Payload;
 
 namespace Walmart.Sdk.Marketplace
 {
-    public class ApiClient: BaseApiClient
-    {
-        public ApiClient(Base.Primitive.Config.IApiClientConfig config) : base(config)
-        {
-        }
-    }
+	public class ApiClient : BaseApiClient
+	{
+		public ApiClient(Base.Primitive.Config.IApiClientConfig config) : base(config)
+		{
+		}
+	}
 }

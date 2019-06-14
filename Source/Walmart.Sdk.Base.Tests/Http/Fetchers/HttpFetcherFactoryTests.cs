@@ -16,28 +16,30 @@ limitations under the License.
 
 namespace Walmart.Sdk.Base.Test.Http
 {
-    using Xunit;
+	using Xunit;
 
-    public class HttpFetcherFactoryTests
-    {
-        [Fact]
-        public void FetcherCreatedOnlyOnce()
-        {
-            var config = new Primitive.BaseConfig("test", "test");
-            config.BaseUrl = "http://www.test.com";
-            config.RequestTimeoutMs = 1000;
+	public class HttpFetcherFactoryTests
+	{
+		[Fact]
+		public void FetcherCreatedOnlyOnce()
+		{
+			var config = new Primitive.BaseConfig("test", "test")
+			{
+				BaseUrl = "http://www.test.com",
+				RequestTimeoutMs = 1000
+			};
 
-            var fetcherFactory = new Base.Http.Fetcher.FetcherFactory();
-            var fetcher = fetcherFactory.CreateFetcher(false, config);
-            var sameFetcher = fetcherFactory.CreateFetcher(false, config);
+			var fetcherFactory = new Base.Http.Fetcher.FetcherFactory();
+			Base.Http.Fetcher.IFetcher fetcher = fetcherFactory.CreateFetcher(false, config);
+			Base.Http.Fetcher.IFetcher sameFetcher = fetcherFactory.CreateFetcher(false, config);
 
-            Assert.Same(fetcher, sameFetcher);
+			Assert.Same(fetcher, sameFetcher);
 
-            var fetcherFactory2 = new Base.Http.Fetcher.FetcherFactory();
-            var fakeFetcher = fetcherFactory2.CreateFetcher(true, config);
-            var sameFakeFetcher = fetcherFactory2.CreateFetcher(true, config);
+			var fetcherFactory2 = new Base.Http.Fetcher.FetcherFactory();
+			Base.Http.Fetcher.IFetcher fakeFetcher = fetcherFactory2.CreateFetcher(true, config);
+			Base.Http.Fetcher.IFetcher sameFakeFetcher = fetcherFactory2.CreateFetcher(true, config);
 
-            Assert.Same(fakeFetcher, sameFakeFetcher);
-        }
-    }
+			Assert.Same(fakeFetcher, sameFakeFetcher);
+		}
+	}
 }

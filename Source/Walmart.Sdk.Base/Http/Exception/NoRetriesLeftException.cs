@@ -14,27 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Walmart.Sdk.Base.Http.Exception
 {
-    public class NoRetriesLeftException : Primitive.BaseException
-    {
-        public int RetryCount { get; private set; }
+	public class NoRetriesLeftException : Primitive.BaseException
+	{
+		public int RetryCount { get; private set; }
 
-        private NoRetriesLeftException(string message, System.Exception innerException): base(message, innerException)
-        {}
+		private NoRetriesLeftException(string message, System.Exception innerException) : base(message, innerException)
+		{ }
 
-        public static NoRetriesLeftException Factory(int retryCount, System.Exception innerException)
-        {
-            var exceptionMessage = string.Format("All {0} retry attempts spent. ", retryCount.ToString());
-            var exception = new NoRetriesLeftException(exceptionMessage, innerException);
-            exception.RetryCount = retryCount;
-            return exception;
-        }
-    }
+		public static NoRetriesLeftException Factory(int retryCount, System.Exception innerException)
+		{
+			var exceptionMessage = string.Format("All {0} retry attempts spent. ", retryCount.ToString());
+			var exception = new NoRetriesLeftException(exceptionMessage, innerException)
+			{
+				RetryCount = retryCount
+			};
+			return exception;
+		}
+	}
 }

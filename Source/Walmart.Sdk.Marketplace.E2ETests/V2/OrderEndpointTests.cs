@@ -16,59 +16,61 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.E2ETests.V2
 {
-    using System;
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Marketplace.V2.Api;
-    using Walmart.Sdk.Marketplace.V2.Api.Request;
-    using Walmart.Sdk.Marketplace.V2.Payload.Order;
-    using Xunit;
+	using System;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Api;
+	using Walmart.Sdk.Marketplace.V2.Api.Request;
+	using Walmart.Sdk.Marketplace.V2.Payload.Order;
+	using Xunit;
 
-    public class OrderEndpointTests: BaseE2ETest
-    {
-        private readonly OrderEndpoint orderApi;
+	public class OrderEndpointTests : BaseE2ETest
+	{
+		private readonly OrderEndpoint orderApi;
 
-        public OrderEndpointTests()
-        {
-            orderApi = new OrderEndpoint(client);
-        }
+		public OrderEndpointTests()
+		{
+			orderApi = new OrderEndpoint(client);
+		}
 
-        [Fact]
-        public async Task RetrieveListOfFeeds()
-        {
-            var result = await orderApi.GetAllReleasedOrders(new DateTime(2017, 01, 01), new DateTime(2018, 04, 04), 20);
-            Assert.IsType<OrdersListType>(result);
-        }
+		[Fact]
+		public async Task RetrieveListOfFeeds()
+		{
+			OrdersListType result = await orderApi.GetAllReleasedOrders(new DateTime(2017, 01, 01), new DateTime(2018, 04, 04), 20);
+			Assert.IsType<OrdersListType>(result);
+		}
 
-        [Fact]
-        public async Task ForReleasedOrdersGetFirstAndSecondPagesWithCursor()
-        {
-            var startDate = new DateTime(DateTime.Now.Year - 2, DateTime.Now.Month, 01);
-            var endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01);
-            var limit = 1;
+		[Fact]
+		public async Task ForReleasedOrdersGetFirstAndSecondPagesWithCursor()
+		{
+			var startDate = new DateTime(DateTime.Now.Year - 2, DateTime.Now.Month, 01);
+			var endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01);
+			var limit = 1;
 
-            var firstPage = await orderApi.GetAllReleasedOrders(startDate, endDate, limit);
-            Assert.IsType<OrdersListType>(firstPage);
-            Assert.Equal(limit, firstPage.Elements.Orders.Count);
-            Assert.True(firstPage.Meta.NextCursor.Length > 0);
-            var nextCursor = firstPage.Meta.NextCursor;
+			OrdersListType firstPage = await orderApi.GetAllReleasedOrders(startDate, endDate, limit);
+			Assert.IsType<OrdersListType>(firstPage);
+			Assert.Equal(limit, firstPage.Elements.Orders.Count);
+			Assert.True(firstPage.Meta.NextCursor.Length > 0);
+			var nextCursor = firstPage.Meta.NextCursor;
 
-            var secondPage = await orderApi.GetAllReleasedOrders(nextCursor);
-            Assert.IsType<OrdersListType>(secondPage);
-            Assert.Equal(limit, secondPage.Elements.Orders.Count);
-            Assert.True(secondPage.Meta.NextCursor.Length > 0);
-        }
+			OrdersListType secondPage = await orderApi.GetAllReleasedOrders(nextCursor);
+			Assert.IsType<OrdersListType>(secondPage);
+			Assert.Equal(limit, secondPage.Elements.Orders.Count);
+			Assert.True(secondPage.Meta.NextCursor.Length > 0);
+		}
 
-        [Fact]
-        public async Task GetAllOrdersWithFiltering()
-        {
-            var filter = new OrderFilter();
-            filter.CreatedEndDate = DateTime.Now;
-            filter.CreatedStartDate = new DateTime(DateTime.Now.Year - 2, DateTime.Now.Month, 1);
-            filter.Limit = 20;
+		[Fact]
+		public async Task GetAllOrdersWithFiltering()
+		{
+			var filter = new OrderFilter
+			{
+				CreatedEndDate = DateTime.Now,
+				CreatedStartDate = new DateTime(DateTime.Now.Year - 2, DateTime.Now.Month, 1),
+				Limit = 20
+			};
 
-            var firstPage = await orderApi.GetAllOrders(filter);
-            Assert.IsType<OrdersListType>(firstPage);
-            Assert.True(firstPage.Elements.Orders.Count > 0);
-        }
-    }
+			OrdersListType firstPage = await orderApi.GetAllOrders(filter);
+			Assert.IsType<OrdersListType>(firstPage);
+			Assert.True(firstPage.Elements.Orders.Count > 0);
+		}
+	}
 }

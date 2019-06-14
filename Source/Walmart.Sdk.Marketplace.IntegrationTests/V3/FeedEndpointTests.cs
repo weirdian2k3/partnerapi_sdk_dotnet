@@ -16,56 +16,58 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.IntegrationTests.V3
 {
-    using Xunit;
-    using Walmart.Sdk.Marketplace.V3.Payload;
-    using Walmart.Sdk.Marketplace.V3.Payload.Feed;
-    using System.Threading.Tasks;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V3.Payload;
+	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
+	using Xunit;
 
-    /// <summary>
-    ///  Class for testing feedApi
-    /// </summary>
-    /// <remarks>
-    /// Please update the test case below to test the API endpoint.чгтше
-    /// </remarks>
-    public class FeedEndpointTests: BaseIntegrationTest
-    {
-        private readonly Marketplace.V3.Api.FeedEndpoint feedApi;
+	/// <summary>
+	///  Class for testing feedApi
+	/// </summary>
+	/// <remarks>
+	/// Please update the test case below to test the API endpoint.чгтше
+	/// </remarks>
+	public class FeedEndpointTests : BaseIntegrationTest
+	{
+		private readonly Marketplace.V3.Api.FeedEndpoint feedApi;
 
-        public FeedEndpointTests()
-        {
-            var config = new Marketplace.ClientConfig("test", "test-key");
-            var apiClient = new Marketplace.ApiClient(config);
-            apiClient.SimulationEnabled = true;
-            feedApi = new Marketplace.V3.Api.FeedEndpoint(apiClient);
-        }
+		public FeedEndpointTests()
+		{
+			var config = new Marketplace.ClientConfig("test", "test-key");
+			var apiClient = new Marketplace.ApiClient(config)
+			{
+				SimulationEnabled = true
+			};
+			feedApi = new Marketplace.V3.Api.FeedEndpoint(apiClient);
+		}
 
-        /// <summary>
-        /// Test GetFeedStatus
-        /// </summary>
-        [Fact]
-        public async Task FeedStatusReturnsResult()
-        {
-            PartnerFeedResponse result = await feedApi.GetFeedStatus("test");
-            Assert.IsType<PartnerFeedResponse>(result);
-            Assert.NotEmpty(result.FeedId);
-        }
+		/// <summary>
+		/// Test GetFeedStatus
+		/// </summary>
+		[Fact]
+		public async Task FeedStatusReturnsResult()
+		{
+			PartnerFeedResponse result = await feedApi.GetFeedStatus("test");
+			Assert.IsType<PartnerFeedResponse>(result);
+			Assert.NotEmpty(result.FeedId);
+		}
 
-        [Fact]
-        public async Task CanGetAllFeedStatuses()
-        {
-            FeedRecordResponse result = await feedApi.GetAllFeedStatuses();
-            Assert.IsType<FeedRecordResponse>(result);
-            Assert.NotEmpty(result.Results);
-            Assert.True(result.TotalResults > 0);
-        }
+		[Fact]
+		public async Task CanGetAllFeedStatuses()
+		{
+			FeedRecordResponse result = await feedApi.GetAllFeedStatuses();
+			Assert.IsType<FeedRecordResponse>(result);
+			Assert.NotEmpty(result.Results);
+			Assert.True(result.TotalResults > 0);
+		}
 
-        [Fact]
-        public async Task CanUploadItemFile()
-        {
-            var stream = GetRequestStub("V3.requestStub.itemFeed");
-            var result = await feedApi.UploadFeed(stream, FeedType.item);
-            Assert.IsType<FeedAcknowledgement>(result);
-            Assert.NotEmpty(result.FeedId);
-        }
-    }
+		[Fact]
+		public async Task CanUploadItemFile()
+		{
+			System.IO.Stream stream = GetRequestStub("V3.requestStub.itemFeed");
+			FeedAcknowledgement result = await feedApi.UploadFeed(stream, FeedType.item);
+			Assert.IsType<FeedAcknowledgement>(result);
+			Assert.NotEmpty(result.FeedId);
+		}
+	}
 }

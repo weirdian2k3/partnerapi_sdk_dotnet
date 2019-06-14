@@ -14,33 +14,50 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Walmart.Sdk.Base.Primitive
 {
-    public class LoggerContainer
-    {
-        public static ILoggerAdapter Logger = new NullLogger();
+	public class LoggerContainer
+	{
+		public static ILoggerAdapter Logger = new NullLogger();
 
-        private static LoggerContainer instance;
-        public static LoggerContainer GetInstance()
-        {
-            if (instance is null)
-            {
-                instance = new Primitive.LoggerContainer();
-            }
-            return instance;
-        }
+		private static LoggerContainer instance;
+		public static LoggerContainer GetInstance()
+		{
+			if (instance is null)
+			{
+				instance = new Primitive.LoggerContainer();
+			}
+			return instance;
+		}
 
-        public void Info(string message) => Logger.Info(message);
-        public void Debug(string message) => Logger.Debug(message);
-        public void Warning(string message) => Logger.Warning(message);
-        public void Error(string message) => Logger.Error(message);
-        public void Fatal(string message) => Logger.Fatal(message);
-        public bool IsLevelEnabled(LogLevel level) => Logger.IsLevelEnabled(level);
-    }
+		public void Info(string message)
+		{
+			Logger.Info(message);
+		}
+
+		public void Debug(string message)
+		{
+			Logger.Debug(message);
+		}
+
+		public void Warning(string message)
+		{
+			Logger.Warning(message);
+		}
+
+		public void Error(string message)
+		{
+			Logger.Error(message);
+		}
+
+		public void Fatal(string message)
+		{
+			Logger.Fatal(message);
+		}
+
+		public bool IsLevelEnabled(LogLevel level)
+		{
+			return Logger.IsLevelEnabled(level);
+		}
+	}
 }

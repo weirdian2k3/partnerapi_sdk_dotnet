@@ -16,144 +16,144 @@ limitations under the License.
 
 namespace Walmart.Sdk.Base.Test.Http
 {
-    using System.Threading.Tasks;
-    using Xunit;
-    using Moq;
-    using Walmart.Sdk.Base.Http;
-    using Walmart.Sdk.Base.Http.Fetcher;
-    using System.Net;
-    using System.Net.Sockets;
+	using System.Net;
+	using System.Net.Sockets;
+	using System.Threading.Tasks;
+	using Moq;
+	using Walmart.Sdk.Base.Http;
+	using Walmart.Sdk.Base.Http.Fetcher;
+	using Xunit;
 
-    public class HttpFetcherTests
-    { 
+	public class HttpFetcherTests
+	{
 
-        [Fact]
-        public async Task EmptyBaseUriTriggersException()
-        {
-            var factory = new MockRepository(MockBehavior.Loose);
-            var config = factory.Create<Primitive.Config.IHttpConfig>();
-            config.Setup(t => t.RequestTimeoutMs).Returns(1000);
-            config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
-            var client = factory.Create<IHttpClient>();
-            var request = factory.Create<Base.Http.IRequest>();
-            request.Setup(t => t.EndpointUri).Returns("");
+		[Fact]
+		public async Task EmptyBaseUriTriggersException()
+		{
+			var factory = new MockRepository(MockBehavior.Loose);
+			Mock<Primitive.Config.IHttpConfig> config = factory.Create<Primitive.Config.IHttpConfig>();
+			config.Setup(t => t.RequestTimeoutMs).Returns(1000);
+			config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
+			Mock<IHttpClient> client = factory.Create<IHttpClient>();
+			Mock<IRequest> request = factory.Create<Base.Http.IRequest>();
+			request.Setup(t => t.EndpointUri).Returns("");
 
-            var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
+			var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
 
-            // should trigger InitException
-            await Assert.ThrowsAsync<Base.Exception.InvalidValueException>(
-                () => instance.ExecuteAsync(request.Object)
-            );
+			// should trigger InitException
+			await Assert.ThrowsAsync<Base.Exception.InvalidValueException>(
+			    () => instance.ExecuteAsync(request.Object)
+			);
 
-            factory.Verify();
-        }
+			factory.Verify();
+		}
 
-        [Fact]
-        public async Task VerifyThrownExceptionFor503Response()
-        {
-            var factory = new MockRepository(MockBehavior.Loose);
-            var config = factory.Create<Primitive.Config.IHttpConfig>();
-            config.Setup(t => t.RequestTimeoutMs).Returns(1000);
-            config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
-            var client = factory.Create<IHttpClient>();
-            var request = factory.Create<Base.Http.IRequest>();
-            request.Setup(t => t.EndpointUri).Returns("/api/uri");
-            var response = factory.Create<IResponse>();
-            response.Setup(t => t.StatusCode).Returns(HttpStatusCode.ServiceUnavailable);
+		[Fact]
+		public async Task VerifyThrownExceptionFor503Response()
+		{
+			var factory = new MockRepository(MockBehavior.Loose);
+			Mock<Primitive.Config.IHttpConfig> config = factory.Create<Primitive.Config.IHttpConfig>();
+			config.Setup(t => t.RequestTimeoutMs).Returns(1000);
+			config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
+			Mock<IHttpClient> client = factory.Create<IHttpClient>();
+			Mock<IRequest> request = factory.Create<Base.Http.IRequest>();
+			request.Setup(t => t.EndpointUri).Returns("/api/uri");
+			Mock<IResponse> response = factory.Create<IResponse>();
+			response.Setup(t => t.StatusCode).Returns(HttpStatusCode.ServiceUnavailable);
 
-            var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
-            client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ReturnsAsync(response.Object);
+			var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
+			client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ReturnsAsync(response.Object);
 
-            await Assert.ThrowsAsync<Base.Http.Exception.GatewayException>(
-                () => instance.ExecuteAsync(request.Object)
-            );
-        }
+			await Assert.ThrowsAsync<Base.Http.Exception.GatewayException>(
+			    () => instance.ExecuteAsync(request.Object)
+			);
+		}
 
-        [Fact]
-        public async Task VerifyBehaviorForApiThrottling()
-        {
-            var factory = new MockRepository(MockBehavior.Loose);
-            
-            var config = factory.Create<Primitive.Config.IHttpConfig>();
-            config.Setup(t => t.RequestTimeoutMs).Returns(1000);
-            config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
-            var client = factory.Create<IHttpClient>();
-            var request = factory.Create<Base.Http.IRequest>();
-            request.Setup(t => t.EndpointUri).Returns("/api/uri");
-            var response = factory.Create<IResponse>();
-            response.Setup(t => t.StatusCode).Returns((System.Net.HttpStatusCode)429);
+		[Fact]
+		public async Task VerifyBehaviorForApiThrottling()
+		{
+			var factory = new MockRepository(MockBehavior.Loose);
 
-            var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
-            client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ReturnsAsync(response.Object);
+			Mock<Primitive.Config.IHttpConfig> config = factory.Create<Primitive.Config.IHttpConfig>();
+			config.Setup(t => t.RequestTimeoutMs).Returns(1000);
+			config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
+			Mock<IHttpClient> client = factory.Create<IHttpClient>();
+			Mock<IRequest> request = factory.Create<Base.Http.IRequest>();
+			request.Setup(t => t.EndpointUri).Returns("/api/uri");
+			Mock<IResponse> response = factory.Create<IResponse>();
+			response.Setup(t => t.StatusCode).Returns((System.Net.HttpStatusCode)429);
 
-            await Assert.ThrowsAsync<Base.Http.Exception.ThrottleException>(
-                () => instance.ExecuteAsync(request.Object)
-            );
-        }
+			var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
+			client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ReturnsAsync(response.Object);
 
-        [Fact]
-        public async Task VerifyTimeoutBehavior()
-        {
-            var factory = new MockRepository(MockBehavior.Loose);
-            var config = factory.Create<Primitive.Config.IHttpConfig>();
-            config.Setup(t => t.RequestTimeoutMs).Returns(1000);
-            config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
-            var client = factory.Create<IHttpClient>();
-            var request = factory.Create<Base.Http.IRequest>();
-            request.Setup(t => t.EndpointUri).Returns("/api/uri");
-            var response = factory.Create<IResponse>();
-            response.Setup(t => t.StatusCode).Returns(HttpStatusCode.ServiceUnavailable);
+			await Assert.ThrowsAsync<Base.Http.Exception.ThrottleException>(
+			    () => instance.ExecuteAsync(request.Object)
+			);
+		}
 
-            var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
-            client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ThrowsAsync(new TaskCanceledException());
+		[Fact]
+		public async Task VerifyTimeoutBehavior()
+		{
+			var factory = new MockRepository(MockBehavior.Loose);
+			Mock<Primitive.Config.IHttpConfig> config = factory.Create<Primitive.Config.IHttpConfig>();
+			config.Setup(t => t.RequestTimeoutMs).Returns(1000);
+			config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
+			Mock<IHttpClient> client = factory.Create<IHttpClient>();
+			Mock<IRequest> request = factory.Create<Base.Http.IRequest>();
+			request.Setup(t => t.EndpointUri).Returns("/api/uri");
+			Mock<IResponse> response = factory.Create<IResponse>();
+			response.Setup(t => t.StatusCode).Returns(HttpStatusCode.ServiceUnavailable);
 
-            await Assert.ThrowsAsync<Base.Http.Exception.ConnectionException>(
-                () => instance.ExecuteAsync(request.Object)
-            );
-        }
+			var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
+			client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ThrowsAsync(new TaskCanceledException());
 
-        [Fact]
-        public async Task VerifySocketErrorBehavior()
-        {
-            var factory = new MockRepository(MockBehavior.Loose);
-            var config = factory.Create<Primitive.Config.IHttpConfig>();
-            config.Setup(t => t.RequestTimeoutMs).Returns(1000);
-            config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
-            var client = factory.Create<IHttpClient>();
-            var request = factory.Create<Base.Http.IRequest>();
-            request.Setup(t => t.EndpointUri).Returns("/api/uri");
-            var response = factory.Create<IResponse>();
-            response.Setup(t => t.StatusCode).Returns(HttpStatusCode.ServiceUnavailable);
+			await Assert.ThrowsAsync<Base.Http.Exception.ConnectionException>(
+			    () => instance.ExecuteAsync(request.Object)
+			);
+		}
 
-            var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
-            client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ThrowsAsync(new System.Exception("test", new SocketException()));
+		[Fact]
+		public async Task VerifySocketErrorBehavior()
+		{
+			var factory = new MockRepository(MockBehavior.Loose);
+			Mock<Primitive.Config.IHttpConfig> config = factory.Create<Primitive.Config.IHttpConfig>();
+			config.Setup(t => t.RequestTimeoutMs).Returns(1000);
+			config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
+			Mock<IHttpClient> client = factory.Create<IHttpClient>();
+			Mock<IRequest> request = factory.Create<Base.Http.IRequest>();
+			request.Setup(t => t.EndpointUri).Returns("/api/uri");
+			Mock<IResponse> response = factory.Create<IResponse>();
+			response.Setup(t => t.StatusCode).Returns(HttpStatusCode.ServiceUnavailable);
 
-            await Assert.ThrowsAsync<Base.Http.Exception.ConnectionException>(
-                () => instance.ExecuteAsync(request.Object)
-            );
-        }
+			var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
+			client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ThrowsAsync(new System.Exception("test", new SocketException()));
 
-        [Fact]
-        public void ValidRequestFlowWorks()
-        {
-            var factory = new MockRepository(MockBehavior.Loose);
-            var config = factory.Create<Primitive.Config.IHttpConfig>();
-            config.Setup(t => t.RequestTimeoutMs).Returns(1000);
-            config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
-            var client = factory.Create<IHttpClient>();
-            var request = factory.Create<Base.Http.IRequest>();
-            request.Setup(t => t.EndpointUri).Returns("/api/uri");
-            var response = factory.Create<IResponse>();
+			await Assert.ThrowsAsync<Base.Http.Exception.ConnectionException>(
+			    () => instance.ExecuteAsync(request.Object)
+			);
+		}
 
-            var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
-            client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ReturnsAsync(response.Object);
+		[Fact]
+		public void ValidRequestFlowWorks()
+		{
+			var factory = new MockRepository(MockBehavior.Loose);
+			Mock<Primitive.Config.IHttpConfig> config = factory.Create<Primitive.Config.IHttpConfig>();
+			config.Setup(t => t.RequestTimeoutMs).Returns(1000);
+			config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
+			Mock<IHttpClient> client = factory.Create<IHttpClient>();
+			Mock<IRequest> request = factory.Create<Base.Http.IRequest>();
+			request.Setup(t => t.EndpointUri).Returns("/api/uri");
+			Mock<IResponse> response = factory.Create<IResponse>();
 
-            var task = instance.ExecuteAsync(request.Object);
-            task.Wait();
+			var instance = new Base.Http.Fetcher.HttpFetcher(config.Object, client.Object);
+			client.Setup(t => t.SendAsync(It.IsAny<IRequest>())).ReturnsAsync(response.Object);
 
-            client.Verify(t => t.SendAsync(It.IsAny<IRequest>()), Times.Once);
-            request.Verify(t => t.EndpointUri, Times.Once);
-            factory.VerifyAll();
-        }
-    }
+			Task<IResponse> task = instance.ExecuteAsync(request.Object);
+			task.Wait();
+
+			client.Verify(t => t.SendAsync(It.IsAny<IRequest>()), Times.Once);
+			request.Verify(t => t.EndpointUri, Times.Once);
+			factory.VerifyAll();
+		}
+	}
 }

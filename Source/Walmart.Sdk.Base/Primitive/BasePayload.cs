@@ -14,18 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using Newtonsoft.Json;
-using System.IO;
-using System.Reflection;
 using System.Xml.Serialization;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Text;
 
 namespace Walmart.Sdk.Base.Primitive
 {
-    public class BasePayload : IPayload
-    {
-        public XmlSerializerNamespaces Xmlns { get; set; } = new XmlSerializerNamespaces();
-    }
+	public class BasePayload : IPayload
+	{
+		public XmlSerializerNamespaces Xmlns { get; set; } = new XmlSerializerNamespaces();
+	}
 }

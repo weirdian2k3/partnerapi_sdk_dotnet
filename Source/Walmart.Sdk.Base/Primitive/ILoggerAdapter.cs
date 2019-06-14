@@ -14,30 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Walmart.Sdk.Base.Primitive
 {
-    public interface ILoggerAdapter
-    {
-        void Info(string message);
-        void Debug(string message);
-        void Warning(string message);
-        void Error(string message);
-        void Fatal(string message);
-        bool IsLevelEnabled(LogLevel level);
-    }
+	public interface ILoggerAdapter
+	{
+		void Info(string message);
+		void Debug(string message);
+		void Warning(string message);
+		void Error(string message);
+		void Fatal(string message);
+		bool IsLevelEnabled(LogLevel level);
+	}
 
-    public enum LogLevel
-    {
-        INFO,
-        DEBUG,
-        WARNING,
-        ERROR,
-        FATAL
-    }
+	public enum LogLevel
+	{
+		INFO,
+		DEBUG,
+		WARNING,
+		ERROR,
+		FATAL
+	}
 }

@@ -14,21 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 
 namespace Walmart.Sdk.Marketplace.IntegrationTests
 {
-    public abstract class BaseIntegrationTest
-    {
-        protected Stream GetRequestStub(string name)
-        {
-            var assembly = typeof(BaseIntegrationTest).GetTypeInfo().Assembly;
-            var assemblyName = assembly.GetName().Name;
-            return assembly.GetManifestResourceStream(assemblyName + "." + name + ".xml");
-        }
-    }
+	public abstract class BaseIntegrationTest
+	{
+		protected Stream GetRequestStub(string name)
+		{
+			Assembly assembly = typeof(BaseIntegrationTest).GetTypeInfo().Assembly;
+			var assemblyName = assembly.GetName().Name;
+			return assembly.GetManifestResourceStream(assemblyName + "." + name + ".xml");
+		}
+	}
 }

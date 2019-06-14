@@ -21,61 +21,61 @@ using Walmart.Sdk.Base.Primitive.Config;
 
 namespace Walmart.Sdk.Base.Http
 {
-    public class Handler: IHandler
-    {
-        public static IFetcherFactory FetcherFactory = new Http.Fetcher.FetcherFactory();
+	public class Handler : IHandler
+	{
+		public static IFetcherFactory FetcherFactory = new Http.Fetcher.FetcherFactory();
 
-        private IHttpConfig config;
+		private IHttpConfig config;
 
-        public IFetcher Fetcher { get; private set; }
+		public IFetcher Fetcher { get; private set; }
 
-        public Retry.IRetryPolicy RetryPolicy { get; set; }
+		public Retry.IRetryPolicy RetryPolicy { get; set; }
 
-        private bool simulationEnabled = false;
-        public bool SimulationEnabled
-        {
-            get { return simulationEnabled; }
-            set
-            {
-                simulationEnabled = value;
-                Fetcher = FetcherFactory.CreateFetcher(simulationEnabled, config);
-            }
-        }
+		private bool simulationEnabled = false;
+		public bool SimulationEnabled
+		{
+			get => simulationEnabled;
+			set
+			{
+				simulationEnabled = value;
+				Fetcher = FetcherFactory.CreateFetcher(simulationEnabled, config);
+			}
+		}
 
-        public Handler(IHttpConfig apiConfig)
-        {
-            config = apiConfig;
-            SimulationEnabled = false;
-            RetryPolicy = new Retry.LuckyMePolicy();
-        }
+		public Handler(IHttpConfig apiConfig)
+		{
+			config = apiConfig;
+			SimulationEnabled = false;
+			RetryPolicy = new Retry.LuckyMePolicy();
+		}
 
-        private Task<IResponse> ExecuteAsync(IRequest request)
-        {
-            return RetryPolicy.GetResponse(Fetcher, request);
-        }
+		private Task<IResponse> ExecuteAsync(IRequest request)
+		{
+			return RetryPolicy.GetResponse(Fetcher, request);
+		}
 
-        public Task<IResponse> GetAsync(IRequest request)
-        {
-            request.Method = HttpMethod.Get;
-            return ExecuteAsync(request);
-        }
+		public Task<IResponse> GetAsync(IRequest request)
+		{
+			request.Method = HttpMethod.Get;
+			return ExecuteAsync(request);
+		}
 
-        public Task<IResponse> PostAsync(IRequest request)
-        {
-            request.Method = HttpMethod.Post;
-            return ExecuteAsync(request);
-        }
+		public Task<IResponse> PostAsync(IRequest request)
+		{
+			request.Method = HttpMethod.Post;
+			return ExecuteAsync(request);
+		}
 
-        public Task<IResponse> PutAsync(IRequest request)
-        {
-            request.Method = HttpMethod.Put;
-            return ExecuteAsync(request);
-        }
+		public Task<IResponse> PutAsync(IRequest request)
+		{
+			request.Method = HttpMethod.Put;
+			return ExecuteAsync(request);
+		}
 
-        public Task<IResponse> DeleteAsync(IRequest request)
-        {
-            request.Method = HttpMethod.Delete;
-            return ExecuteAsync(request);
-        }
-    }
+		public Task<IResponse> DeleteAsync(IRequest request)
+		{
+			request.Method = HttpMethod.Delete;
+			return ExecuteAsync(request);
+		}
+	}
 }

@@ -14,26 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 namespace Walmart.Sdk.Marketplace.V2.Api
 {
-    using System.Threading.Tasks;
-    using System.IO;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using System.IO;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
 
-    public class PromotionEndpoint : Base.Primitive.BaseEndpoint
-    {
-        protected FeedEndpoint feedApi;
-        public PromotionEndpoint(Base.Primitive.IEndpointClient apiClient) : base(apiClient)
-        {
-            feedApi = new FeedEndpoint(apiClient);
-        }
+	public class PromotionEndpoint : Base.Primitive.BaseEndpoint
+	{
+		protected FeedEndpoint feedApi;
+		public PromotionEndpoint(Base.Primitive.IEndpointClient apiClient) : base(apiClient)
+		{
+			feedApi = new FeedEndpoint(apiClient);
+		}
 
-        public async Task<FeedAcknowledgement> UpdatePromotionPricesInBulk(Stream stream)
-        {
-            return await feedApi.UploadFeed(stream, Payload.FeedType.promo);
-        }
-    }
+		public async Task<FeedAcknowledgement> UpdatePromotionPricesInBulk(Stream stream)
+		{
+			return await feedApi.UploadFeed(stream, Payload.FeedType.promo);
+		}
+	}
 }

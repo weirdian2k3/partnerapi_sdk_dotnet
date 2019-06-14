@@ -14,34 +14,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Walmart.Sdk.Base.Primitive;
 
 namespace Walmart.Sdk.Base.Serialization
 {
-    public class SerializerFactory: ISerializerFactory
-    {
-        private static Serialization.JsonSerializer jsonSerializer;
-        private static Serialization.XmlSerializer xmlSerializer;
+	public class SerializerFactory : ISerializerFactory
+	{
+		private static Serialization.JsonSerializer jsonSerializer;
+		private static Serialization.XmlSerializer xmlSerializer;
 
-        static SerializerFactory()
-        {
-            jsonSerializer = new Serialization.JsonSerializer();
-            xmlSerializer = new Serialization.XmlSerializer();
-        }
+		static SerializerFactory()
+		{
+			jsonSerializer = new Serialization.JsonSerializer();
+			xmlSerializer = new Serialization.XmlSerializer();
+		}
 
-        public ISerializer GetSerializer(ApiFormat format)
-        {
-            switch (format)
-            {
-                case ApiFormat.JSON:
-                    return jsonSerializer;
-                default:
-                case ApiFormat.XML:
-                    return xmlSerializer;
-            }
-        }
-    }
+		public ISerializer GetSerializer(ApiFormat format)
+		{
+			switch (format)
+			{
+				case ApiFormat.JSON:
+					return jsonSerializer;
+				default:
+				case ApiFormat.XML:
+					return xmlSerializer;
+			}
+		}
+	}
 }

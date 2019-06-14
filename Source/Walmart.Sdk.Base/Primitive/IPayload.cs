@@ -14,15 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace Walmart.Sdk.Base.Primitive
 {
-    public interface IPayload
-    {
-        XmlSerializerNamespaces Xmlns { get; set; }
-    }
+	public interface IPayload
+	{
+		XmlSerializerNamespaces Xmlns { get; set; }
+	}
 }

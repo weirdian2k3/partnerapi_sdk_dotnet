@@ -14,33 +14,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Walmart.Sdk.Base.Primitive
 {
-    public enum ServiceNameType
-    {
-        WalmartMarketplace = 1,
-        DropShipVendorServices = 2,
-        WarehouseSupplierServices = 3
-    }
+	public enum ServiceNameType
+	{
+		WalmartMarketplace = 1,
+		DropShipVendorServices = 2,
+		WarehouseSupplierServices = 3
+	}
 
-    public static class ServiceName
-    {
-        public static string GetName(ServiceNameType type)
-        {
-            switch (type)
-            {
-                case ServiceNameType.DropShipVendorServices:
-                    return "Drop Ship Vendor Services";
-                case ServiceNameType.WarehouseSupplierServices:
-                    return "Warehouse Supplier Services";
-                default:
-                case ServiceNameType.WalmartMarketplace:
-                    return "Walmart Marketplace";
-            }
-        }
-    }
+	public static class ServiceName
+	{
+		public static string GetName(ServiceNameType type)
+		{
+			switch (type)
+			{
+				case ServiceNameType.DropShipVendorServices:
+					return "Drop Ship Vendor Services";
+				case ServiceNameType.WarehouseSupplierServices:
+					return "Warehouse Supplier Services";
+				default:
+				case ServiceNameType.WalmartMarketplace:
+					return "Walmart Marketplace";
+			}
+		}
+	}
 }

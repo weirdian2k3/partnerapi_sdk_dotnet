@@ -16,50 +16,52 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.IntegrationTests.V3
 {
-    using Xunit;
-    using Walmart.Sdk.Marketplace.V3.Api;
-    using Walmart.Sdk.Marketplace.V3.Payload.Feed;
-    using Walmart.Sdk.Marketplace.V3.Payload.Promotion;
-    using System.Threading.Tasks;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V3.Api;
+	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
+	using Walmart.Sdk.Marketplace.V3.Payload.Promotion;
+	using Xunit;
 
-    public class PromotionEndpointTests : BaseIntegrationTest
-    {
-        private readonly PromotionEndpoint promotionApi;
+	public class PromotionEndpointTests : BaseIntegrationTest
+	{
+		private readonly PromotionEndpoint promotionApi;
 
-        public PromotionEndpointTests()
-        {
-            var config = new ClientConfig("test", "test-key");
-            var apiClient = new ApiClient(config);
-            apiClient.SimulationEnabled = true;
-            promotionApi = new PromotionEndpoint(apiClient);
-        }
+		public PromotionEndpointTests()
+		{
+			var config = new ClientConfig("test", "test-key");
+			var apiClient = new ApiClient(config)
+			{
+				SimulationEnabled = true
+			};
+			promotionApi = new PromotionEndpoint(apiClient);
+		}
 
-        [Fact]
-        public async Task UpdatePromotionsInBulk()
-        {
-            var stream = GetRequestStub("V3.requestStub.promotionFeed");
-            var result = await promotionApi.UpdateBulkPromotions(stream);
-            Assert.IsType<FeedAcknowledgement>(result);
-            Assert.NotEmpty(result.FeedId);
-        }
+		[Fact]
+		public async Task UpdatePromotionsInBulk()
+		{
+			System.IO.Stream stream = GetRequestStub("V3.requestStub.promotionFeed");
+			FeedAcknowledgement result = await promotionApi.UpdateBulkPromotions(stream);
+			Assert.IsType<FeedAcknowledgement>(result);
+			Assert.NotEmpty(result.FeedId);
+		}
 
-        [Fact]
-        public async Task UpdateSinglePromotion()
-        {
-            var stream = GetRequestStub("V3.requestStub.updatePromotion");
-            var result = await promotionApi.UpdatePromotionPrice(stream);
-            Assert.IsType<ItemPriceResponse>(result);
-            Assert.True(result.Mart.Length > 0);
-            Assert.True(result.Sku.Length > 0);
-            Assert.True(result.Message.Length > 0);
-        }
+		[Fact]
+		public async Task UpdateSinglePromotion()
+		{
+			System.IO.Stream stream = GetRequestStub("V3.requestStub.updatePromotion");
+			ItemPriceResponse result = await promotionApi.UpdatePromotionPrice(stream);
+			Assert.IsType<ItemPriceResponse>(result);
+			Assert.True(result.Mart.Length > 0);
+			Assert.True(result.Sku.Length > 0);
+			Assert.True(result.Message.Length > 0);
+		}
 
-        [Fact]
-        public async Task GetPromotion()
-        {
-            var result = await promotionApi.GetPromotionPrice("test");
-            Assert.IsType<ServiceResponse>(result);
-            Assert.Equal(Status.OK, result.Status);
-        }
-    }
+		[Fact]
+		public async Task GetPromotion()
+		{
+			ServiceResponse result = await promotionApi.GetPromotionPrice("test");
+			Assert.IsType<ServiceResponse>(result);
+			Assert.Equal(Status.OK, result.Status);
+		}
+	}
 }

@@ -14,14 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Walmart.Sdk.Base.Http.Fetcher
 {
-    public interface IFetcherFactory
-    {
-        IFetcher CreateFetcher(bool fakeFetcher, Primitive.Config.IHttpConfig cfg);
-    }
+	public interface IFetcherFactory
+	{
+		IFetcher CreateFetcher(bool fakeFetcher, Primitive.Config.IHttpConfig cfg);
+	}
 }

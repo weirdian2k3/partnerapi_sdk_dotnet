@@ -14,20 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Walmart.Sdk.Base.Primitive;
-
 namespace Walmart.Sdk.Base.Http.Exception
 {
-    public class GatewayException: HttpException
-    {
-        public GatewayException(string message): base(message)
-        { }
-        public GatewayException(string message, System.Exception exception) : base(message, exception)
-        { }
-    }
+	public class GatewayException : HttpException
+	{
+		public GatewayException(string message) : base(message)
+		{ }
+		public GatewayException(string message, System.Exception exception) : base(message, exception)
+		{ }
+	}
 }

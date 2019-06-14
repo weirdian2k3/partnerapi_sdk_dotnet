@@ -16,42 +16,42 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.E2ETests.V2
 {
-    using Xunit;
-    using Walmart.Sdk.Marketplace.V2.Api;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
-    using System.Threading.Tasks;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Api;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using Xunit;
 
-    public class FeedEndpointTests : BaseE2ETest
-    {
-        private readonly FeedEndpoint feedApi;
+	public class FeedEndpointTests : BaseE2ETest
+	{
+		private readonly FeedEndpoint feedApi;
 
-        public FeedEndpointTests()
-        {
-            feedApi = new FeedEndpoint(client);
-        }
+		public FeedEndpointTests()
+		{
+			feedApi = new FeedEndpoint(client);
+		}
 
-        [Fact]
-        public async Task CanRetrieveListOfFeeds()
-        {
-            var feeds = await feedApi.GetAllFeedStatuses();
-            Assert.IsType<FeedRecordResponse>(feeds);
-            Assert.NotEmpty(feeds.Results);
-            foreach (var feed in feeds.Results)
-            {
-                Assert.True(feed.FeedId.Length > 0);
-            }
-        }
+		[Fact]
+		public async Task CanRetrieveListOfFeeds()
+		{
+			FeedRecordResponse feeds = await feedApi.GetAllFeedStatuses();
+			Assert.IsType<FeedRecordResponse>(feeds);
+			Assert.NotEmpty(feeds.Results);
+			foreach (FeedRecord feed in feeds.Results)
+			{
+				Assert.True(feed.FeedId.Length > 0);
+			}
+		}
 
-        [Fact]
-        public async Task CanCheckFeedStatus()
-        {
-            var feeds = await feedApi.GetAllFeedStatuses();
-            Assert.IsType<FeedRecordResponse>(feeds);
-            Assert.NotEmpty(feeds.Results);
-            var feedId = feeds.Results[0].FeedId;
-            var result = await feedApi.GetFeedStatus(feedId, true);
-            Assert.IsType<PartnerFeedResponse>(result);
-            Assert.True(result.FeedId == feedId);
-        }
-    }
+		[Fact]
+		public async Task CanCheckFeedStatus()
+		{
+			FeedRecordResponse feeds = await feedApi.GetAllFeedStatuses();
+			Assert.IsType<FeedRecordResponse>(feeds);
+			Assert.NotEmpty(feeds.Results);
+			var feedId = feeds.Results[0].FeedId;
+			PartnerFeedResponse result = await feedApi.GetFeedStatus(feedId, true);
+			Assert.IsType<PartnerFeedResponse>(result);
+			Assert.True(result.FeedId == feedId);
+		}
+	}
 }

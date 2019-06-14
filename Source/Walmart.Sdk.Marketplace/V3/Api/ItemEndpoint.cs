@@ -16,64 +16,71 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V3.Api
 {
-    using System.IO;
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Base.Primitive;
-    using Walmart.Sdk.Marketplace.V3.Payload.Feed;
+	using System.IO;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Base.Primitive;
+	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
 
-    public class ItemEndpoint: Base.Primitive.BaseEndpoint
-    {
-        protected FeedEndpoint feedApi;
-        public ItemEndpoint(Base.Primitive.IEndpointClient apiClient) : base(apiClient)
-        {
-            feedApi = new FeedEndpoint(apiClient);
-            payloadFactory = new V3.Payload.PayloadFactory();
-        }
+	public class ItemEndpoint : Base.Primitive.BaseEndpoint
+	{
+		protected FeedEndpoint feedApi;
+		public ItemEndpoint(Base.Primitive.IEndpointClient apiClient) : base(apiClient)
+		{
+			feedApi = new FeedEndpoint(apiClient);
+			payloadFactory = new V3.Payload.PayloadFactory();
+		}
 
-        public async Task<FeedAcknowledgement> BulkItemsUpdate(Stream stream)
-        {
-            return await feedApi.UploadFeed(stream, V3.Payload.FeedType.item);
-        }
+		public async Task<FeedAcknowledgement> BulkItemsUpdate(Stream stream)
+		{
+			return await feedApi.UploadFeed(stream, V3.Payload.FeedType.item);
+		}
 
-        public async Task<ItemResponses> GetAllItems(int limit = 10, int offset = 0)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<ItemResponses> GetAllItems(int limit = 10, int offset = 0)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var request = CreateRequest();
-            request.EndpointUri = "/v3/items";
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = "/v3/items";
 
-            if (limit > 0) request.QueryParams.Add("limit", limit.ToString());
-            if (offset > 0) request.QueryParams.Add("offset", offset.ToString());
+			if (limit > 0)
+			{
+				request.QueryParams.Add("limit", limit.ToString());
+			}
 
-            var response = await client.GetAsync(request);
-            ItemResponses result = await ProcessResponse<ItemResponses>(response);
-            return result;
-        }
+			if (offset > 0)
+			{
+				request.QueryParams.Add("offset", offset.ToString());
+			}
 
-        public async Task<ItemResponse> GetItem(string merchantSku)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+			Base.Http.IResponse response = await client.GetAsync(request);
+			ItemResponses result = await ProcessResponse<ItemResponses>(response);
+			return result;
+		}
 
-            var request = CreateRequest();
-            request.EndpointUri = string.Format("/v3/items/{0}", merchantSku);
+		public async Task<ItemResponse> GetItem(string merchantSku)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var response = await client.GetAsync(request);
-            ItemResponses result = await ProcessResponse<ItemResponses>(response);
-            return result.ItemResponse[0];
-        }
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = string.Format("/v3/items/{0}", merchantSku);
 
-        public async Task<ItemRetireResponse> RetireItem(string merchantSku)
-        {
-            await new ContextRemover();
+			Base.Http.IResponse response = await client.GetAsync(request);
+			ItemResponses result = await ProcessResponse<ItemResponses>(response);
+			return result.ItemResponse[0];
+		}
 
-            var request = CreateRequest();
-            request.EndpointUri = string.Format("/v3/items/{0}", merchantSku);
+		public async Task<ItemRetireResponse> RetireItem(string merchantSku)
+		{
+			await new ContextRemover();
 
-            var response = await client.DeleteAsync(request);
-            ItemRetireResponse result = await ProcessResponse<ItemRetireResponse>(response);
-            return result;
-        }
-    }
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = string.Format("/v3/items/{0}", merchantSku);
+
+			Base.Http.IResponse response = await client.DeleteAsync(request);
+			ItemRetireResponse result = await ProcessResponse<ItemRetireResponse>(response);
+			return result;
+		}
+	}
 }

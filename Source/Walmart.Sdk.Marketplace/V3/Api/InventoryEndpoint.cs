@@ -16,24 +16,23 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V3.Api
 {
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Base.Http;
-    using Walmart.Sdk.Marketplace.V3.Payload.Feed;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
 
-    public class InventoryEndpoint: Base.Primitive.BaseEndpoint
-    {
-        private FeedEndpoint feedApi;
+	public class InventoryEndpoint : Base.Primitive.BaseEndpoint
+	{
+		private FeedEndpoint feedApi;
 
-        public InventoryEndpoint(Base.Primitive.IEndpointClient client) : base(client)
-        {
-            feedApi = new FeedEndpoint(apiClient);
-            payloadFactory = new V3.Payload.PayloadFactory();
-        }
+		public InventoryEndpoint(Base.Primitive.IEndpointClient client) : base(client)
+		{
+			feedApi = new FeedEndpoint(apiClient);
+			payloadFactory = new V3.Payload.PayloadFactory();
+		}
 
-        /* proxy call to Feed endpoint */
-        public async Task<FeedAcknowledgement> UpdateBulkInventory(System.IO.Stream file)
-        {
-            return await feedApi.UploadFeed(file, V3.Payload.FeedType.inventory);
-        }
-    }
+		/* proxy call to Feed endpoint */
+		public async Task<FeedAcknowledgement> UpdateBulkInventory(System.IO.Stream file)
+		{
+			return await feedApi.UploadFeed(file, V3.Payload.FeedType.inventory);
+		}
+	}
 }

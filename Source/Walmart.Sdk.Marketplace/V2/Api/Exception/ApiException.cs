@@ -14,32 +14,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
 using Walmart.Sdk.Base.Http;
 using Walmart.Sdk.Base.Primitive;
 
 namespace Walmart.Sdk.Marketplace.V2.Api.Exception
 {
-    public class ApiException : BaseException
-    {
-        public IErrorsPayload Details { get; private set; }
-        public IResponse Response { get; private set; }
+	public class ApiException : BaseException
+	{
+		public IErrorsPayload Details { get; private set; }
+		public IResponse Response { get; private set; }
 
-        protected ApiException(string message) : base(message)
-        { }
+		protected ApiException(string message) : base(message)
+		{ }
 
-        public static ApiException Factory(IErrorsPayload errorDetails, IResponse errorResponse)
-        {
-            var httpResponse = errorResponse.RawResponse;
-            var exceptionMessage = string.Format("API Error Occured [{0} {1}]", ((int)httpResponse.StatusCode).ToString(), httpResponse.ReasonPhrase);
-            exceptionMessage += errorDetails.RenderErrors();
-            var exception = new ApiException(exceptionMessage)
-            {
-                Details = errorDetails,
-                Response = errorResponse
-            };
-            
-            return exception;
-        }
-    }
+		public static ApiException Factory(IErrorsPayload errorDetails, IResponse errorResponse)
+		{
+			System.Net.Http.HttpResponseMessage httpResponse = errorResponse.RawResponse;
+			var exceptionMessage = string.Format("API Error Occured [{0} {1}]", ((int)httpResponse.StatusCode).ToString(), httpResponse.ReasonPhrase);
+			exceptionMessage += errorDetails.RenderErrors();
+			var exception = new ApiException(exceptionMessage)
+			{
+				Details = errorDetails,
+				Response = errorResponse
+			};
+
+			return exception;
+		}
+	}
 }

@@ -16,82 +16,90 @@ limitations under the License.
 
 namespace Walmart.Sdk.Base.Test.Http
 {
-    using Xunit;
-    using Moq;
-    using Walmart.Sdk.Base.Http.Fetcher;
-    using System.Threading.Tasks;
+	using System.Threading.Tasks;
+	using Moq;
+	using Walmart.Sdk.Base.Http.Fetcher;
+	using Xunit;
 
-    public class HandlerTests
-    {
-        [Fact]
-        public void SimulationModeSwitchFetchers()
-        {
-            var config = new Primitive.BaseConfig("test", "test");
-            config.BaseUrl = "http://www.test.com";
-            config.RequestTimeoutMs = 1000;
+	public class HandlerTests
+	{
+		[Fact]
+		public void SimulationModeSwitchFetchers()
+		{
+			var config = new Primitive.BaseConfig("test", "test")
+			{
+				BaseUrl = "http://www.test.com",
+				RequestTimeoutMs = 1000
+			};
 
-            var handlerFactory = new Base.Http.HttpFactory();
-            var handler = handlerFactory.GetHttpHandler(config);
+			var handlerFactory = new Base.Http.HttpFactory();
+			Base.Http.IHandler handler = handlerFactory.GetHttpHandler(config);
 
-            Assert.IsType<Base.Http.Fetcher.HttpFetcher>(handler.Fetcher);
+			Assert.IsType<Base.Http.Fetcher.HttpFetcher>(handler.Fetcher);
 
-            handler.SimulationEnabled = true;
+			handler.SimulationEnabled = true;
 
-            Assert.IsType<Base.Http.Fetcher.LocalFetcher>(handler.Fetcher);
-        }
+			Assert.IsType<Base.Http.Fetcher.LocalFetcher>(handler.Fetcher);
+		}
 
-        [Fact]
-        public async Task GetRequestGoThroughRetryPolicy()
-        {
-            var response = new Mock<Base.Http.IResponse>();
-            var request = new Mock<Base.Http.IRequest>();
-            var policy = new Mock<Base.Http.Retry.IRetryPolicy>();
-            policy.Setup(t => t.GetResponse(It.IsAny<IFetcher>(), It.IsAny<Base.Http.IRequest>()))
-                .ReturnsAsync(response.Object);
-            var config = new Mock<Base.Primitive.Config.IHttpConfig>();
-            config.Setup(t => t.RequestTimeoutMs).Returns(1000);
-            config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
+		[Fact]
+		public async Task GetRequestGoThroughRetryPolicy()
+		{
+			var response = new Mock<Base.Http.IResponse>();
+			var request = new Mock<Base.Http.IRequest>();
+			var policy = new Mock<Base.Http.Retry.IRetryPolicy>();
+			policy.Setup(t => t.GetResponse(It.IsAny<IFetcher>(), It.IsAny<Base.Http.IRequest>()))
+			    .ReturnsAsync(response.Object);
+			var config = new Mock<Base.Primitive.Config.IHttpConfig>();
+			config.Setup(t => t.RequestTimeoutMs).Returns(1000);
+			config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
 
-            var handler = new Base.Http.Handler(config.Object);
-            handler.RetryPolicy = policy.Object;
-            var result = await handler.GetAsync(request.Object);
-            Assert.Equal(response.Object, result);
-        }
+			var handler = new Base.Http.Handler(config.Object)
+			{
+				RetryPolicy = policy.Object
+			};
+			Base.Http.IResponse result = await handler.GetAsync(request.Object);
+			Assert.Equal(response.Object, result);
+		}
 
-        [Fact]
-        public async Task PostRequestGoThroughRetryPolicy()
-        {
-            var response = new Mock<Base.Http.IResponse>();
-            var request = new Mock<Base.Http.IRequest>();
-            var policy = new Mock<Base.Http.Retry.IRetryPolicy>();
-            policy.Setup(t => t.GetResponse(It.IsAny<IFetcher>(), It.IsAny<Base.Http.IRequest>()))
-                .ReturnsAsync(response.Object);
-            var config = new Mock<Base.Primitive.Config.IHttpConfig>();
-            config.Setup(t => t.RequestTimeoutMs).Returns(1000);
-            config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
+		[Fact]
+		public async Task PostRequestGoThroughRetryPolicy()
+		{
+			var response = new Mock<Base.Http.IResponse>();
+			var request = new Mock<Base.Http.IRequest>();
+			var policy = new Mock<Base.Http.Retry.IRetryPolicy>();
+			policy.Setup(t => t.GetResponse(It.IsAny<IFetcher>(), It.IsAny<Base.Http.IRequest>()))
+			    .ReturnsAsync(response.Object);
+			var config = new Mock<Base.Primitive.Config.IHttpConfig>();
+			config.Setup(t => t.RequestTimeoutMs).Returns(1000);
+			config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
 
-            var handler = new Base.Http.Handler(config.Object);
-            handler.RetryPolicy = policy.Object;
-            var result = await handler.PostAsync(request.Object);
-            Assert.Equal(response.Object, result);
-        }
+			var handler = new Base.Http.Handler(config.Object)
+			{
+				RetryPolicy = policy.Object
+			};
+			Base.Http.IResponse result = await handler.PostAsync(request.Object);
+			Assert.Equal(response.Object, result);
+		}
 
-        [Fact]
-        public async Task PutRequestGoThroughRetryPolicy()
-        {
-            var response = new Mock<Base.Http.IResponse>();
-            var request = new Mock<Base.Http.IRequest>();
-            var policy = new Mock<Base.Http.Retry.IRetryPolicy>();
-            policy.Setup(t => t.GetResponse(It.IsAny<IFetcher>(), It.IsAny<Base.Http.IRequest>()))
-                .ReturnsAsync(response.Object);
-            var config = new Mock<Base.Primitive.Config.IHttpConfig>();
-            config.Setup(t => t.RequestTimeoutMs).Returns(1000);
-            config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
+		[Fact]
+		public async Task PutRequestGoThroughRetryPolicy()
+		{
+			var response = new Mock<Base.Http.IResponse>();
+			var request = new Mock<Base.Http.IRequest>();
+			var policy = new Mock<Base.Http.Retry.IRetryPolicy>();
+			policy.Setup(t => t.GetResponse(It.IsAny<IFetcher>(), It.IsAny<Base.Http.IRequest>()))
+			    .ReturnsAsync(response.Object);
+			var config = new Mock<Base.Primitive.Config.IHttpConfig>();
+			config.Setup(t => t.RequestTimeoutMs).Returns(1000);
+			config.Setup(t => t.BaseUrl).Returns("http://www.test.com");
 
-            var handler = new Base.Http.Handler(config.Object);
-            handler.RetryPolicy = policy.Object;
-            var result = await handler.PutAsync(request.Object);
-            Assert.Equal(response.Object, result);
-        }
-    }
+			var handler = new Base.Http.Handler(config.Object)
+			{
+				RetryPolicy = policy.Object
+			};
+			Base.Http.IResponse result = await handler.PutAsync(request.Object);
+			Assert.Equal(response.Object, result);
+		}
+	}
 }

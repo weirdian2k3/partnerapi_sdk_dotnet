@@ -16,29 +16,31 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.IntegrationTests.V2
 {
-    using Xunit;
-    using Walmart.Sdk.Marketplace.V2.Api;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
-    using System.Threading.Tasks;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Api;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using Xunit;
 
-    public class PromotionEndpointTests : BaseIntegrationTest
-    {
-        private readonly PromotionEndpoint promotionApi;
-        public PromotionEndpointTests()
-        {
-            var config = new ClientConfig("test", "test-key");
-            var apiClient = new ApiClient(config);
-            apiClient.SimulationEnabled = true;
-            promotionApi = new PromotionEndpoint(apiClient);
-        }
+	public class PromotionEndpointTests : BaseIntegrationTest
+	{
+		private readonly PromotionEndpoint promotionApi;
+		public PromotionEndpointTests()
+		{
+			var config = new ClientConfig("test", "test-key");
+			var apiClient = new ApiClient(config)
+			{
+				SimulationEnabled = true
+			};
+			promotionApi = new PromotionEndpoint(apiClient);
+		}
 
-        [Fact]
-        public async Task UpdatePromotionsInBulk()
-        {
-            var stream = GetRequestStub("V2.requestStub.promotionFeed");
-            var result = await promotionApi.UpdatePromotionPricesInBulk(stream);
-            Assert.IsType<FeedAcknowledgement>(result);
-            Assert.NotEmpty(result.FeedId);
-        }
-    }
+		[Fact]
+		public async Task UpdatePromotionsInBulk()
+		{
+			System.IO.Stream stream = GetRequestStub("V2.requestStub.promotionFeed");
+			FeedAcknowledgement result = await promotionApi.UpdatePromotionPricesInBulk(stream);
+			Assert.IsType<FeedAcknowledgement>(result);
+			Assert.NotEmpty(result.FeedId);
+		}
+	}
 }

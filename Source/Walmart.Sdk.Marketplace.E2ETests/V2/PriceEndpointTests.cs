@@ -16,57 +16,57 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.E2ETests.V2
 {
-    using System.IO;
-    using System.Text;
-    using Xunit;
-    using Walmart.Sdk.Marketplace.V2.Api;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
-    using System.Threading.Tasks;
+	using System.IO;
+	using System.Text;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Api;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using Xunit;
 
-    public class PriceEndpointTests: BaseE2ETest
-    {
-        private readonly PriceEndpoint priceApi;
-        private readonly ItemEndpoint itemApi;
+	public class PriceEndpointTests : BaseE2ETest
+	{
+		private readonly PriceEndpoint priceApi;
+		private readonly ItemEndpoint itemApi;
 
-        public PriceEndpointTests()
-        {
-            priceApi = new PriceEndpoint(client);
-            itemApi = new ItemEndpoint(client);
-        }
+		public PriceEndpointTests()
+		{
+			priceApi = new PriceEndpoint(client);
+			itemApi = new ItemEndpoint(client);
+		}
 
-        private Stream GetRequestContentForPriceUpdate(string resourceName, string sku, double price, string currency)
-        {
-            var content = new StreamReader(LoadRequestStub(resourceName)).ReadToEnd();
-            content = content
-                .Replace("{{sku}}", sku)
-                .Replace("{{price}}", price.ToString())
-                .Replace("{{currency}}", currency);
-            return new MemoryStream(Encoding.UTF8.GetBytes(content));
-        }
+		private Stream GetRequestContentForPriceUpdate(string resourceName, string sku, double price, string currency)
+		{
+			var content = new StreamReader(LoadRequestStub(resourceName)).ReadToEnd();
+			content = content
+			    .Replace("{{sku}}", sku)
+			    .Replace("{{price}}", price.ToString())
+			    .Replace("{{currency}}", currency);
+			return new MemoryStream(Encoding.UTF8.GetBytes(content));
+		}
 
-        [Fact]
-        public async Task CanUpdatePriceForSpecificItem()
-        {
-            var amount = 99990.0;
-            var currency = "USD";
-            var sku = "NETSDK_TEST";
+		[Fact]
+		public async Task CanUpdatePriceForSpecificItem()
+		{
+			var amount = 99990.0;
+			var currency = "USD";
+			var sku = "NETSDK_TEST";
 
-            var result = await priceApi.UpdatePrice(sku, currency, amount);
-            Assert.IsType<ItemPriceResponse>(result);
-            Assert.Equal(sku, result.Sku);
-        }
+			ItemPriceResponse result = await priceApi.UpdatePrice(sku, currency, amount);
+			Assert.IsType<ItemPriceResponse>(result);
+			Assert.Equal(sku, result.Sku);
+		}
 
-        [Fact]
-        public async Task CanUpdatePricesInBulk()
-        {
-            var amount = 400.0;
-            var currency = "USD";
-            var oneItemList = await itemApi.GetAllItems(1, 10);
-            var sku = oneItemList.Items[0].Sku;
-            var payloadStream = GetRequestContentForPriceUpdate("V2.requestStub.updatePrice", sku, amount, currency);
-            var result = await priceApi.UpdateBulkPrices(payloadStream);
-            Assert.IsType<FeedAcknowledgement>(result);
-            Assert.True(result.FeedId.Length > 0);
-        }
-    }
+		[Fact]
+		public async Task CanUpdatePricesInBulk()
+		{
+			var amount = 400.0;
+			var currency = "USD";
+			Marketplace.V2.Payload.Item.ItemViewList oneItemList = await itemApi.GetAllItems(1, 10);
+			var sku = oneItemList.Items[0].Sku;
+			Stream payloadStream = GetRequestContentForPriceUpdate("V2.requestStub.updatePrice", sku, amount, currency);
+			FeedAcknowledgement result = await priceApi.UpdateBulkPrices(payloadStream);
+			Assert.IsType<FeedAcknowledgement>(result);
+			Assert.True(result.FeedId.Length > 0);
+		}
+	}
 }

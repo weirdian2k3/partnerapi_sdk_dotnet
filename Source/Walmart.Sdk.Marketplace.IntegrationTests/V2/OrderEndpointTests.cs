@@ -16,113 +16,117 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.IntegrationTests.V2
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Marketplace.V2.Api.Request;
-    using Walmart.Sdk.Marketplace.V2.Payload.Order;
-    using Xunit;
+	using System;
+	using System.Linq;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Api.Request;
+	using Walmart.Sdk.Marketplace.V2.Payload.Order;
+	using Xunit;
 
-    public class OrderEndpointTests: BaseIntegrationTest
-    {
-        private readonly Marketplace.V2.Api.OrderEndpoint orderApi;
+	public class OrderEndpointTests : BaseIntegrationTest
+	{
+		private readonly Marketplace.V2.Api.OrderEndpoint orderApi;
 
-        public OrderEndpointTests()
-        {
-            var config = new Marketplace.ClientConfig("test", "test-key");
-            var apiClient = new Marketplace.ApiClient(config);
-            apiClient.SimulationEnabled = true;
-            orderApi = new Marketplace.V2.Api.OrderEndpoint(apiClient);
-        }
+		public OrderEndpointTests()
+		{
+			var config = new Marketplace.ClientConfig("test", "test-key");
+			var apiClient = new Marketplace.ApiClient(config)
+			{
+				SimulationEnabled = true
+			};
+			orderApi = new Marketplace.V2.Api.OrderEndpoint(apiClient);
+		}
 
-        [Fact]
-        public async Task CanFetchOneOrder()
-        {
-            var result = await orderApi.GetOrderById("test");
-            Assert.IsType<Order>(result);
-            Assert.True(result.PurchaseOrderId.Length > 0);
-            Assert.True(result.OrderLines.Lines.Count > 0);
-            // checking children objects
-            // it's very easy to screw up deserialization of these objects
-            // so make sure they were parsed correctly
-            Assert.True(result.OrderLines.Lines[0].Charges.Count() > 0);
-            Assert.True(result.OrderLines.Lines[0].Charges[0].ChargeName.Length > 0);
-            Assert.True(result.OrderLines.Lines[0].Charges[0].ChargeType.Length > 0);
-            Assert.True(result.OrderLines.Lines[0].OrderLineStatuses.Count() > 0);
-            Assert.True(result.OrderLines.Lines[0].OrderLineStatuses[0].Status == OrderLineStatusValueType.Acknowledged);
-            Assert.True(result.OrderLines.Lines[0].OrderLineStatuses[0].StatusQuantity.Amount.Length > 0);
-            Assert.True(result.OrderLines.Lines[0].OrderLineStatuses[0].StatusQuantity.UnitOfMeasurement.Length > 0);
-        }
+		[Fact]
+		public async Task CanFetchOneOrder()
+		{
+			Order result = await orderApi.GetOrderById("test");
+			Assert.IsType<Order>(result);
+			Assert.True(result.PurchaseOrderId.Length > 0);
+			Assert.True(result.OrderLines.Lines.Count > 0);
+			// checking children objects
+			// it's very easy to screw up deserialization of these objects
+			// so make sure they were parsed correctly
+			Assert.True(result.OrderLines.Lines[0].Charges.Count() > 0);
+			Assert.True(result.OrderLines.Lines[0].Charges[0].ChargeName.Length > 0);
+			Assert.True(result.OrderLines.Lines[0].Charges[0].ChargeType.Length > 0);
+			Assert.True(result.OrderLines.Lines[0].OrderLineStatuses.Count() > 0);
+			Assert.True(result.OrderLines.Lines[0].OrderLineStatuses[0].Status == OrderLineStatusValueType.Acknowledged);
+			Assert.True(result.OrderLines.Lines[0].OrderLineStatuses[0].StatusQuantity.Amount.Length > 0);
+			Assert.True(result.OrderLines.Lines[0].OrderLineStatuses[0].StatusQuantity.UnitOfMeasurement.Length > 0);
+		}
 
-        [Fact]
-        public async Task GetListOfReleasedOrdersWithPagination()
-        {
-            var startDate = new DateTime(DateTime.Now.Year - 1, DateTime.Now.Month, 01);
-            var endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01);
-            var pageSize = 20;
-            var firstPage = await orderApi.GetAllReleasedOrders(startDate, endDate, pageSize);
-            Assert.True(firstPage.Elements.Orders.Count > 0);
-            Assert.True(firstPage.Meta.NextCursor.Length > 0);
-            Assert.True(firstPage.Meta.TotalCount > firstPage.Elements.Orders.Count);
+		[Fact]
+		public async Task GetListOfReleasedOrdersWithPagination()
+		{
+			var startDate = new DateTime(DateTime.Now.Year - 1, DateTime.Now.Month, 01);
+			var endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01);
+			var pageSize = 20;
+			OrdersListType firstPage = await orderApi.GetAllReleasedOrders(startDate, endDate, pageSize);
+			Assert.True(firstPage.Elements.Orders.Count > 0);
+			Assert.True(firstPage.Meta.NextCursor.Length > 0);
+			Assert.True(firstPage.Meta.TotalCount > firstPage.Elements.Orders.Count);
 
-            var secondPage = await orderApi.GetAllReleasedOrders(firstPage.Meta.NextCursor);
-            Assert.True(secondPage.Elements.Orders.Count > 0);
-            Assert.True(secondPage.Meta.NextCursor.Length > 0);
-            Assert.True(secondPage.Meta.TotalCount > secondPage.Elements.Orders.Count);
-        }
+			OrdersListType secondPage = await orderApi.GetAllReleasedOrders(firstPage.Meta.NextCursor);
+			Assert.True(secondPage.Elements.Orders.Count > 0);
+			Assert.True(secondPage.Meta.NextCursor.Length > 0);
+			Assert.True(secondPage.Meta.TotalCount > secondPage.Elements.Orders.Count);
+		}
 
-        [Fact]
-        public async Task CanFilterAllOrders()
-        {
-            var filter = new OrderFilter();
-            filter.CreatedEndDate = DateTime.Now;
-            filter.CreatedStartDate = new DateTime(DateTime.Now.Year - 2, DateTime.Now.Month, 1);
-            filter.ToExpectedShipDate = DateTime.Now;
-            filter.FromExpectedShipDate = new DateTime(DateTime.Now.Year - 2, DateTime.Now.Month, 1);
-            filter.CustomerOrderId = "test";
-            filter.PurchaseOrderId = "test";
-            filter.Status = OrderLineStatusValueType.Shipped;
-            filter.Limit = 20;
+		[Fact]
+		public async Task CanFilterAllOrders()
+		{
+			var filter = new OrderFilter
+			{
+				CreatedEndDate = DateTime.Now,
+				CreatedStartDate = new DateTime(DateTime.Now.Year - 2, DateTime.Now.Month, 1),
+				ToExpectedShipDate = DateTime.Now,
+				FromExpectedShipDate = new DateTime(DateTime.Now.Year - 2, DateTime.Now.Month, 1),
+				CustomerOrderId = "test",
+				PurchaseOrderId = "test",
+				Status = OrderLineStatusValueType.Shipped,
+				Limit = 20
+			};
 
-            var firstPage = await orderApi.GetAllOrders(filter);
-            Assert.IsType<OrdersListType>(firstPage);
-            Assert.True(firstPage.Elements.Orders.Count > 0);
-        }
+			OrdersListType firstPage = await orderApi.GetAllOrders(filter);
+			Assert.IsType<OrdersListType>(firstPage);
+			Assert.True(firstPage.Elements.Orders.Count > 0);
+		}
 
-        [Fact]
-        public async Task CanAcknowledgeOrder()
-        {
-            var result = await orderApi.AckOrder("test");
-            Assert.IsType<Order>(result);
-        }
+		[Fact]
+		public async Task CanAcknowledgeOrder()
+		{
+			Order result = await orderApi.AckOrder("test");
+			Assert.IsType<Order>(result);
+		}
 
-        [Fact]
-        public async Task CancelOrderLinesOnSpecificOrder()
-        {
-            var result = await orderApi.CancelOrderLines("test", GetRequestStub("V2.requestStub.cancelOrderLines"));
-            Assert.IsType<Order>(result);
-        }
+		[Fact]
+		public async Task CancelOrderLinesOnSpecificOrder()
+		{
+			Order result = await orderApi.CancelOrderLines("test", GetRequestStub("V2.requestStub.cancelOrderLines"));
+			Assert.IsType<Order>(result);
+		}
 
-        [Fact]
-        public async Task SubmitOrderRefundForSpecificOrder()
-        {
-            var result = await orderApi.RefundOrderLines("test", GetRequestStub("V2.requestStub.refundOrderLines"));
-            Assert.IsType<Order>(result);
-        }
+		[Fact]
+		public async Task SubmitOrderRefundForSpecificOrder()
+		{
+			Order result = await orderApi.RefundOrderLines("test", GetRequestStub("V2.requestStub.refundOrderLines"));
+			Assert.IsType<Order>(result);
+		}
 
-        [Fact]
-        public async Task SendShippingUpdatesForSpecificOrder()
-        {
-            var result = await orderApi.ShippingUpdates("test", GetRequestStub("V2.requestStub.shippingUpdates"));
-            Assert.IsType<Order>(result);
-        }
+		[Fact]
+		public async Task SendShippingUpdatesForSpecificOrder()
+		{
+			Order result = await orderApi.ShippingUpdates("test", GetRequestStub("V2.requestStub.shippingUpdates"));
+			Assert.IsType<Order>(result);
+		}
 
-        [Fact]
-        public async Task InvalidOrderIdThrows404()
-        {
-            await Assert.ThrowsAsync<Walmart.Sdk.Marketplace.V2.Api.Exception.ApiException>(
-                () => orderApi.GetOrderById("wrong-purchase-id")
-            );
-        }
-    }
+		[Fact]
+		public async Task InvalidOrderIdThrows404()
+		{
+			await Assert.ThrowsAsync<Walmart.Sdk.Marketplace.V2.Api.Exception.ApiException>(
+			    () => orderApi.GetOrderById("wrong-purchase-id")
+			);
+		}
+	}
 }

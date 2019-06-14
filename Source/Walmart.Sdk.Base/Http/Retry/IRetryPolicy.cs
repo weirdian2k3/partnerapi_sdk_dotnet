@@ -14,15 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Walmart.Sdk.Base.Http.Retry
 {
-    public interface IRetryPolicy
-    {
-        Task<IResponse> GetResponse(Http.Fetcher.IFetcher fetcher, IRequest request);
-    }
+	public interface IRetryPolicy
+	{
+		Task<IResponse> GetResponse(Http.Fetcher.IFetcher fetcher, IRequest request);
+	}
 }

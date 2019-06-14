@@ -16,41 +16,44 @@ limitations under the License.
 
 namespace Walmart.Sdk.Base.Serialization
 {
-    using System.IO;
-    using System.Text;
-    using Walmart.Sdk.Base.Primitive;
+	using System.IO;
+	using System.Text;
+	using Walmart.Sdk.Base.Primitive;
 
-    public class XmlSerializer : ISerializer
-    {
-        public sealed class Utf8StringWriter : StringWriter
-        {
-            public override Encoding Encoding => Encoding.UTF8;
-        }
+	public class XmlSerializer : ISerializer
+	{
+		public sealed class Utf8StringWriter : StringWriter
+		{
+			public override Encoding Encoding => Encoding.UTF8;
+		}
 
-        public TPayload Deserialize<TPayload>(string content)
-        {
-            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(TPayload));
-            using (var reader = new StringReader(content))
-            {
-                return (TPayload)serializer.Deserialize(reader);
-            }
-        }
+		public TPayload Deserialize<TPayload>(string content)
+		{
+			var serializer = new System.Xml.Serialization.XmlSerializer(typeof(TPayload));
+			using (var reader = new StringReader(content))
+			{
+				return (TPayload)serializer.Deserialize(reader);
+			}
+		}
 
-        /// <summary>
-        /// Converts to xml string and returns
-        /// </summary>
-        /// <returns></returns>
-        public string Serialize<TPayload>(TPayload item)
-        {
-            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(TPayload));
-            var stringWriter = new Utf8StringWriter();
-            if (((IPayload) item).Xmlns.Count > 0)
+		/// <summary>
+		/// Converts to xml string and returns
+		/// </summary>
+		/// <returns></returns>
+		public string Serialize<TPayload>(TPayload item)
+		{
+			var serializer = new System.Xml.Serialization.XmlSerializer(typeof(TPayload));
+			var stringWriter = new Utf8StringWriter();
+			if (((IPayload)item).Xmlns.Count > 0)
+			{
+				serializer.Serialize(stringWriter, item, ((IPayload)item).Xmlns);
+			}
+			else
+			{
+				serializer.Serialize(stringWriter, item);
+			}
 
-                serializer.Serialize(stringWriter, item, ((IPayload) item).Xmlns);
-            else
-                serializer.Serialize(stringWriter, item);
-
-            return stringWriter.ToString();
-        }
-    }
+			return stringWriter.ToString();
+		}
+	}
 }

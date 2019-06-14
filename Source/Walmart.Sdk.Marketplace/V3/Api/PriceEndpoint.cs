@@ -16,74 +16,74 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V3.Api
 {
-    using System.IO;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Newtonsoft.Json;
-    using Walmart.Sdk.Marketplace.V3.Payload.Feed;
-    using Walmart.Sdk.Marketplace.V3.Payload;
-    using Walmart.Sdk.Marketplace.V3.Payload.Cpa;
-    using Walmart.Sdk.Base.Primitive;
+	using System.IO;
+	using System.Net.Http;
+	using System.Net.Http.Headers;
+	using System.Text;
+	using System.Threading.Tasks;
+	using Newtonsoft.Json;
+	using Walmart.Sdk.Base.Primitive;
+	using Walmart.Sdk.Marketplace.V3.Payload;
+	using Walmart.Sdk.Marketplace.V3.Payload.Cpa;
+	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
 
-    public class PriceEndpoint: Base.Primitive.BaseEndpoint
-    {
-        private FeedEndpoint feedApi;
+	public class PriceEndpoint : Base.Primitive.BaseEndpoint
+	{
+		private FeedEndpoint feedApi;
 
-        public PriceEndpoint(ApiClient client) : base(client)
-        {
-            feedApi = new FeedEndpoint(client);
-            payloadFactory = new V3.Payload.PayloadFactory();
-        }
+		public PriceEndpoint(ApiClient client) : base(client)
+		{
+			feedApi = new FeedEndpoint(client);
+			payloadFactory = new V3.Payload.PayloadFactory();
+		}
 
-        public async Task<FeedAcknowledgement> UpdateBulkPrices(Stream stream)
-        {
-            return await feedApi.UploadFeed(stream, FeedType.price);
-        }
+		public async Task<FeedAcknowledgement> UpdateBulkPrices(Stream stream)
+		{
+			return await feedApi.UploadFeed(stream, FeedType.price);
+		}
 
-        public async Task<ItemPriceResponse> UpdatePrice(Stream stream)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<ItemPriceResponse> UpdatePrice(Stream stream)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var request = CreateRequest();
-            request.EndpointUri = "/v3/price";
-            var payload = new StreamReader(stream).ReadToEnd();
-            request.HttpRequest.Content = new StringContent(payload);
-            // have to explicitly set this header for content, otherwise it also has encodding=utf-8
-            // and it breaks response from API
-            request.HttpRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(request.GetContentType());
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = "/v3/price";
+			var payload = new StreamReader(stream).ReadToEnd();
+			request.HttpRequest.Content = new StringContent(payload);
+			// have to explicitly set this header for content, otherwise it also has encodding=utf-8
+			// and it breaks response from API
+			request.HttpRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(request.GetContentType());
 
-            var response = await client.PutAsync(request);
-            
-            var result = await ProcessResponse<ItemPriceResponse>(response);
-            return result;
-        }
+			Base.Http.IResponse response = await client.PutAsync(request);
 
-        public async Task<FeedAcknowledgement> OptInOutBulkCpaSku(Stream stream)
-        {
-            return await feedApi.UploadFeed(stream, FeedType.CPT_SELLER_ELIGIBILITY);
-        }
+			ItemPriceResponse result = await ProcessResponse<ItemPriceResponse>(response);
+			return result;
+		}
 
-        public async Task<EnrollmentResponse> SetupAllCpaSku(bool enroll)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<FeedAcknowledgement> OptInOutBulkCpaSku(Stream stream)
+		{
+			return await feedApi.UploadFeed(stream, FeedType.CPT_SELLER_ELIGIBILITY);
+		}
 
-            var request = CreateRequest();
-            request.EndpointUri = "/v3/cppreference";
-            string content = JsonConvert.SerializeObject(new Payload.Cpa.Enrollment()
-            {
-                Enroll = enroll
-            });
-            request.HttpRequest.Content = new StringContent(content, Encoding.UTF8, "application/json");
-            request.HttpRequest.Headers.Add("Accept", "application/json");
-            
-            var response = await client.PostAsync(request);
-            var responseContent = await response.GetPayloadAsString();
-            var result = JsonConvert.DeserializeObject<EnrollmentResponse>(responseContent);
-            return result;
-        }
-    }
+		public async Task<EnrollmentResponse> SetupAllCpaSku(bool enroll)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
+
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = "/v3/cppreference";
+			var content = JsonConvert.SerializeObject(new Payload.Cpa.Enrollment()
+			{
+				Enroll = enroll
+			});
+			request.HttpRequest.Content = new StringContent(content, Encoding.UTF8, "application/json");
+			request.HttpRequest.Headers.Add("Accept", "application/json");
+
+			Base.Http.IResponse response = await client.PostAsync(request);
+			var responseContent = await response.GetPayloadAsString();
+			EnrollmentResponse result = JsonConvert.DeserializeObject<EnrollmentResponse>(responseContent);
+			return result;
+		}
+	}
 }

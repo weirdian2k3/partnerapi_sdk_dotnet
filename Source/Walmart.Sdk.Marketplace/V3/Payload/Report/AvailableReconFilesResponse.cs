@@ -1,10 +1,8 @@
 ﻿
 namespace Walmart.Sdk.Marketplace.V3.Payload.Report
 {
-	using Newtonsoft.Json;
-	using System;
 	using System.Collections.Generic;
-	using System.Text;
+	using Newtonsoft.Json;
 
 	public class AvailableReconFilesResponse
 	{

@@ -14,19 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Walmart.Sdk.Base.Http
 {
-    public interface IEndpointHttpHandler
-    {
-        Http.Fetcher.IFetcher Fetcher { get; }
-        Task<IResponse> GetAsync(IRequest request);
-        Task<IResponse> PostAsync(IRequest request);
-        Task<IResponse> PutAsync(IRequest request);
-        Task<IResponse> DeleteAsync(IRequest request);
-    }
+	public interface IEndpointHttpHandler
+	{
+		Http.Fetcher.IFetcher Fetcher { get; }
+		Task<IResponse> GetAsync(IRequest request);
+		Task<IResponse> PostAsync(IRequest request);
+		Task<IResponse> PutAsync(IRequest request);
+		Task<IResponse> DeleteAsync(IRequest request);
+	}
 }

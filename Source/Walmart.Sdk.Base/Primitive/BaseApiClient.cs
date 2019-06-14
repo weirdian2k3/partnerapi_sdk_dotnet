@@ -14,47 +14,49 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Walmart.Sdk.Base.Http;
 using Walmart.Sdk.Base.Http.Retry;
-using Walmart.Sdk.Base.Serialization;
 
 namespace Walmart.Sdk.Base.Primitive
 {
-    public abstract class BaseApiClient: IApiClient, IEndpointClient
-    {
-        protected IHttpFactory httpFactory = new HttpFactory();
-        
-        protected IHandler httpHandler;
-        public IEndpointHttpHandler GetHttpHandler() => httpHandler;
+	public abstract class BaseApiClient : IApiClient, IEndpointClient
+	{
+		protected IHttpFactory httpFactory = new HttpFactory();
 
-        protected Config.IEndpointConfig config;
-        public Config.IEndpointConfig GetEndpointConfig() => config;
+		protected IHandler httpHandler;
+		public IEndpointHttpHandler GetHttpHandler()
+		{
+			return httpHandler;
+		}
 
-        public BaseApiClient(Config.IApiClientConfig cfg)
-        {
-            config = cfg;
-            httpHandler = httpFactory.GetHttpHandler(cfg);
-        }
+		protected Config.IEndpointConfig config;
+		public Config.IEndpointConfig GetEndpointConfig()
+		{
+			return config;
+		}
 
-        public bool SimulationEnabled
-        {
-            get { return httpHandler.SimulationEnabled; }
-            set { httpHandler.SimulationEnabled = value; }
-        }
+		public BaseApiClient(Config.IApiClientConfig cfg)
+		{
+			config = cfg;
+			httpHandler = httpFactory.GetHttpHandler(cfg);
+		}
 
-        public IRetryPolicy RetryPolicy
-        {
-            get { return httpHandler.RetryPolicy; }
-            set { httpHandler.RetryPolicy = value; }
-        }
-        
-        public ILoggerAdapter Logger
-        {
-            get { return LoggerContainer.Logger; }
-            set { LoggerContainer.Logger = value; }
-        }
-    }
+		public bool SimulationEnabled
+		{
+			get => httpHandler.SimulationEnabled;
+			set => httpHandler.SimulationEnabled = value;
+		}
+
+		public IRetryPolicy RetryPolicy
+		{
+			get => httpHandler.RetryPolicy;
+			set => httpHandler.RetryPolicy = value;
+		}
+
+		public ILoggerAdapter Logger
+		{
+			get => LoggerContainer.Logger;
+			set => LoggerContainer.Logger = value;
+		}
+	}
 }

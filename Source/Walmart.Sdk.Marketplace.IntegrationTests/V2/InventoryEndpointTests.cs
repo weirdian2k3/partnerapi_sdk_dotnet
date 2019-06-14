@@ -16,93 +16,92 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.IntegrationTests.V2
 {
-    using Xunit;
-    using Walmart.Sdk.Base.Primitive;
-    using Walmart.Sdk.Base.Primitive.Config;
-    using Walmart.Sdk.Marketplace.V2.Api;
-    using Walmart.Sdk.Marketplace.V2.Payload;
-    using Walmart.Sdk.Marketplace.V2.Payload.Inventory;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
-    using System.IO;
-    using System.Threading.Tasks;
+	using System.IO;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Api;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using Walmart.Sdk.Marketplace.V2.Payload.Inventory;
+	using Xunit;
 
-    public class InventoryEndpointTests: BaseIntegrationTest
-    {
-        private readonly InventoryEndpoint inventoryApi;
+	public class InventoryEndpointTests : BaseIntegrationTest
+	{
+		private readonly InventoryEndpoint inventoryApi;
 
-        public InventoryEndpointTests()
-        {
-            var config = new Marketplace.ClientConfig("test", "test-key");
-            var apiClient = new Marketplace.ApiClient(config);
-            apiClient.SimulationEnabled = true;
-            inventoryApi = new Marketplace.V2.Api.InventoryEndpoint(apiClient);
-        }
+		public InventoryEndpointTests()
+		{
+			var config = new Marketplace.ClientConfig("test", "test-key");
+			var apiClient = new Marketplace.ApiClient(config)
+			{
+				SimulationEnabled = true
+			};
+			inventoryApi = new Marketplace.V2.Api.InventoryEndpoint(apiClient);
+		}
 
-        [Fact]
-        public async Task CanGetInventoryForSpecificSku()
-        {
-            var result = await inventoryApi.GetInventory("test");
+		[Fact]
+		public async Task CanGetInventoryForSpecificSku()
+		{
+			Inventory result = await inventoryApi.GetInventory("test");
 
-            Assert.IsType<Inventory>(result);
-            Assert.NotEmpty(result.Sku);
-            Assert.True(result.Quantity.Amount > 0);
-        }
+			Assert.IsType<Inventory>(result);
+			Assert.NotEmpty(result.Sku);
+			Assert.True(result.Quantity.Amount > 0);
+		}
 
-        [Fact]
-        public async Task CanUpdateInventoryForSpecificSkuWithObject()
-        {
-            var inventory = new Inventory()
-            {
-                Sku = "test",
-                Quantity = new Quantity()
-                {
-                    Amount = 100,
-                    Unit = UnitOfMeasurement.EACH
-                },
-                FulfillmentLagTime = 1
-            };
+		[Fact]
+		public async Task CanUpdateInventoryForSpecificSkuWithObject()
+		{
+			var inventory = new Inventory()
+			{
+				Sku = "test",
+				Quantity = new Quantity()
+				{
+					Amount = 100,
+					Unit = UnitOfMeasurement.EACH
+				},
+				FulfillmentLagTime = 1
+			};
 
-            var result = await inventoryApi.UpdateInventory(inventory);
+			Inventory result = await inventoryApi.UpdateInventory(inventory);
 
-            Assert.IsType<Inventory>(result);
-            Assert.NotEmpty(result.Sku);
-            Assert.True(result.Quantity.Amount > 0);
-        }
+			Assert.IsType<Inventory>(result);
+			Assert.NotEmpty(result.Sku);
+			Assert.True(result.Quantity.Amount > 0);
+		}
 
-        [Fact]
-        public async Task CanUpdateInventoryForSpecificSkuWithStream()
-        {
-            var stream = GetRequestStub("V2.requestStub.inventoryUpdate");
+		[Fact]
+		public async Task CanUpdateInventoryForSpecificSkuWithStream()
+		{
+			Stream stream = GetRequestStub("V2.requestStub.inventoryUpdate");
 
-            var result = await inventoryApi.UpdateInventory("test", stream);
+			Inventory result = await inventoryApi.UpdateInventory("test", stream);
 
-            Assert.IsType<Inventory>(result);
-            Assert.NotEmpty(result.Sku);
-            Assert.True(result.Quantity.Amount > 0);
-        }
+			Assert.IsType<Inventory>(result);
+			Assert.NotEmpty(result.Sku);
+			Assert.True(result.Quantity.Amount > 0);
+		}
 
-        [Fact]
-        public async Task CanUpdateInventoryForSpecificSkuWithString()
-        {
-            var stream = GetRequestStub("V2.requestStub.inventoryUpdate");
-            var content = new StreamReader(stream).ReadToEnd();
+		[Fact]
+		public async Task CanUpdateInventoryForSpecificSkuWithString()
+		{
+			Stream stream = GetRequestStub("V2.requestStub.inventoryUpdate");
+			var content = new StreamReader(stream).ReadToEnd();
 
-            var result = await inventoryApi.UpdateInventory("test", content);
+			Inventory result = await inventoryApi.UpdateInventory("test", content);
 
-            Assert.IsType<Inventory>(result);
-            Assert.NotEmpty(result.Sku);
-            Assert.True(result.Quantity.Amount > 0);
-        }
+			Assert.IsType<Inventory>(result);
+			Assert.NotEmpty(result.Sku);
+			Assert.True(result.Quantity.Amount > 0);
+		}
 
-        [Fact]
-        public async Task CanUpdateInventoryInBulk()
-        {
-            var stream = GetRequestStub("V2.requestStub.inventoryBulkUpdate");
+		[Fact]
+		public async Task CanUpdateInventoryInBulk()
+		{
+			Stream stream = GetRequestStub("V2.requestStub.inventoryBulkUpdate");
 
-            FeedAcknowledgement result = await inventoryApi.UpdateBulkInventory(stream);
+			FeedAcknowledgement result = await inventoryApi.UpdateBulkInventory(stream);
 
-            Assert.IsType<FeedAcknowledgement>(result);
-            Assert.NotEmpty(result.FeedId);
-        }
-    }
+			Assert.IsType<FeedAcknowledgement>(result);
+			Assert.NotEmpty(result.FeedId);
+		}
+	}
 }

@@ -16,17 +16,13 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V3.Api
 {
-	using System;
-	using System.Threading.Tasks;
-	using Walmart.Sdk.Base.Http;
-	using Walmart.Sdk.Marketplace.V3.Payload.Report;
-	using Walmart.Sdk.Base.Primitive;
-	using Walmart.Sdk.Marketplace.V3.Api.Request;
-	using Walmart.Sdk.Base.Serialization;
-	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
 	using System.IO;
 	using System.Linq;
 	using System.Net.Http.Headers;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Base.Http;
+	using Walmart.Sdk.Base.Primitive;
+	using Walmart.Sdk.Marketplace.V3.Payload.Report;
 
 	public class ReportEndpoint : BaseEndpoint
 	{
@@ -40,13 +36,13 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			// to avoid deadlock if this method is executed synchronously
 			await new ContextRemover();
 
-			var request = CreateRequest();
+			Base.Http.Request request = CreateRequest();
 
 			request.EndpointUri = "/v3/report/reconreport/availableReconFiles";
 
-			var response = await client.GetAsync(request);
+			IResponse response = await client.GetAsync(request);
 
-			var result = await ProcessResponse<AvailableReconFilesResponse>(response);
+			AvailableReconFilesResponse result = await ProcessResponse<AvailableReconFilesResponse>(response);
 			return result;
 		}
 
@@ -55,12 +51,12 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			// to avoid deadlock if this method is executed synchronously
 			await new ContextRemover();
 
-			var request = CreateRequest();
+			Base.Http.Request request = CreateRequest();
 
-			request.EndpointUri = String.Format("/v3/report/reconreport/reconFile?reportDate={0}", date);
+			request.EndpointUri = string.Format("/v3/report/reconreport/reconFile?reportDate={0}", date);
 			request.HttpRequest.Headers.Add("Accept", "application/octet-stream");
 
-			var response = await client.GetAsync(request);
+			IResponse response = await client.GetAsync(request);
 			var result = await response.RawResponse.Content.ReadAsByteArrayAsync();
 			return result;
 		}
@@ -69,7 +65,7 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 		{
 			var destinationFilePath = string.Empty;
 
-			if (!response.RawResponse.Headers.TryGetValues("Content-Disposition", out var contentDispositionValues))
+			if (!response.RawResponse.Headers.TryGetValues("Content-Disposition", out System.Collections.Generic.IEnumerable<string> contentDispositionValues))
 			{
 				throw new InvalidDataException("Unable to pull filename from Content-Disposition");
 			}
@@ -77,7 +73,7 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			var contentDispositionHeaderValue = new ContentDispositionHeaderValue(contentDispositionValues.First());
 			destinationFilePath = Path.Combine(directoryToSaveTo, contentDispositionHeaderValue.FileName);
 
-			using (var responseStream = await response.RawResponse.Content.ReadAsStreamAsync())
+			using (Stream responseStream = await response.RawResponse.Content.ReadAsStreamAsync())
 			{
 				using (var fileStream = new FileStream(destinationFilePath, FileMode.Create, FileAccess.Write))
 				{
@@ -93,12 +89,12 @@ namespace Walmart.Sdk.Marketplace.V3.Api
 			// to avoid deadlock if this method is executed synchronously
 			await new ContextRemover();
 
-			var request = CreateRequest();
+			Base.Http.Request request = CreateRequest();
 
-			request.EndpointUri = String.Format("/v3/report/reconreport/reconFile?reportDate={0}", date);
+			request.EndpointUri = string.Format("/v3/report/reconreport/reconFile?reportDate={0}", date);
 			request.HttpRequest.Headers.Add("Accept", "application/octet-stream");
 
-			var response = await client.GetAsync(request);
+			IResponse response = await client.GetAsync(request);
 
 			var destinationFilePath = await SaveReportFile(response, directoryToSaveCsvTo);
 

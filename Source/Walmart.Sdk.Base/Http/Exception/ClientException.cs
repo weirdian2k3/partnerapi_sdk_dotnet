@@ -17,16 +17,16 @@ limitations under the License.
 
 namespace Walmart.Sdk.Base.Http.Exception
 {
-    public class ClientException : Primitive.BaseException
-    {
-        public string Reason { get; private set; }
-        public ClientException(string message) : base(message)
-        {
-            Reason = message;
-        }
-        public ClientException(string message, System.Exception ex) : base(message, ex)
-        {
-            Reason = message;
-        }
-    }
+	public class ClientException : Primitive.BaseException
+	{
+		public string Reason { get; private set; }
+		public ClientException(string message) : base(message)
+		{
+			Reason = message;
+		}
+		public ClientException(string message, System.Exception ex) : base(message, ex)
+		{
+			Reason = message;
+		}
+	}
 }

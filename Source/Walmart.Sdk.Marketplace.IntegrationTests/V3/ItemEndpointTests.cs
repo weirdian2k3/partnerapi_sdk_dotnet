@@ -16,60 +16,62 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.IntegrationTests.V3
 {
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Marketplace.V3.Payload.Feed;
-    using Xunit;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V3.Payload.Feed;
+	using Xunit;
 
-    public class ItemEndpointTests: BaseIntegrationTest
-    {
-        private readonly Marketplace.V3.Api.ItemEndpoint itemApi;
+	public class ItemEndpointTests : BaseIntegrationTest
+	{
+		private readonly Marketplace.V3.Api.ItemEndpoint itemApi;
 
-        public ItemEndpointTests()
-        {
-            var config = new Marketplace.ClientConfig("test", "test-key");
-            var apiClient = new Marketplace.ApiClient(config);
-            apiClient.SimulationEnabled = true;
-            itemApi = new Marketplace.V3.Api.ItemEndpoint(apiClient);
-        }
+		public ItemEndpointTests()
+		{
+			var config = new Marketplace.ClientConfig("test", "test-key");
+			var apiClient = new Marketplace.ApiClient(config)
+			{
+				SimulationEnabled = true
+			};
+			itemApi = new Marketplace.V3.Api.ItemEndpoint(apiClient);
+		}
 
-        [Fact]
-        public async Task UpdateItemsInBulk()
-        {
-            var stream = GetRequestStub("V3.requestStub.itemFeed");
-            var result = await itemApi.BulkItemsUpdate(stream);
-            Assert.IsType<FeedAcknowledgement>(result);
-            Assert.NotEmpty(result.FeedId);
-        }
+		[Fact]
+		public async Task UpdateItemsInBulk()
+		{
+			System.IO.Stream stream = GetRequestStub("V3.requestStub.itemFeed");
+			FeedAcknowledgement result = await itemApi.BulkItemsUpdate(stream);
+			Assert.IsType<FeedAcknowledgement>(result);
+			Assert.NotEmpty(result.FeedId);
+		}
 
-        [Fact]
-        public async Task GetOneSpecificItem()
-        {
-            var result = await itemApi.GetItem("test");
-            Assert.IsType<ItemResponse>(result);
-            Assert.True(result.Sku.Length > 0);
-            Assert.True(result.ProductName.Length > 0);
-            Assert.True(result.Gtin.Length > 0);
-        }
+		[Fact]
+		public async Task GetOneSpecificItem()
+		{
+			ItemResponse result = await itemApi.GetItem("test");
+			Assert.IsType<ItemResponse>(result);
+			Assert.True(result.Sku.Length > 0);
+			Assert.True(result.ProductName.Length > 0);
+			Assert.True(result.Gtin.Length > 0);
+		}
 
-        [Fact]
-        public async Task RetireOneSpecificItem()
-        {
-            var result = await itemApi.RetireItem("test");
-            Assert.True(result.Sku.Length > 0);
-        }
+		[Fact]
+		public async Task RetireOneSpecificItem()
+		{
+			ItemRetireResponse result = await itemApi.RetireItem("test");
+			Assert.True(result.Sku.Length > 0);
+		}
 
-        [Fact]
-        public async Task GetListOfItems()
-        {
-            var result = await itemApi.GetAllItems();
-            Assert.IsType<ItemResponses>(result);
-            foreach (var item in result.ItemResponse)
-            {
-                Assert.IsType<ItemResponse>(item);
-                Assert.True(item.Sku.Length > 0);
-                Assert.True(item.ProductName.Length > 0);
-                Assert.True(item.Gtin.Length > 0);
-            }
-        }
-    }
+		[Fact]
+		public async Task GetListOfItems()
+		{
+			ItemResponses result = await itemApi.GetAllItems();
+			Assert.IsType<ItemResponses>(result);
+			foreach (ItemResponse item in result.ItemResponse)
+			{
+				Assert.IsType<ItemResponse>(item);
+				Assert.True(item.Sku.Length > 0);
+				Assert.True(item.ProductName.Length > 0);
+				Assert.True(item.Gtin.Length > 0);
+			}
+		}
+	}
 }

@@ -15,17 +15,14 @@ limitations under the License.
 */
 
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Walmart.Sdk.Base.Http.Fetcher
 {
-    public interface IHttpClient
-    {
-        TimeSpan Timeout { get; set; }
-        Uri BaseAddress { get; set; }
-        Task<IResponse> SendAsync(IRequest request);
-    }
+	public interface IHttpClient
+	{
+		TimeSpan Timeout { get; set; }
+		Uri BaseAddress { get; set; }
+		Task<IResponse> SendAsync(IRequest request);
+	}
 }

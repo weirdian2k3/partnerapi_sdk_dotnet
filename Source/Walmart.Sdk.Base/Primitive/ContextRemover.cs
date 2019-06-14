@@ -16,45 +16,42 @@ limitations under the License.
 
 namespace Walmart.Sdk.Base.Primitive
 {
-    using System;
-    using System.Runtime.CompilerServices;
-    using System.Threading;
+	using System;
+	using System.Runtime.CompilerServices;
+	using System.Threading;
 
-    public struct ContextRemover : INotifyCompletion
-    {
-        public bool IsCompleted
-        {
-            get { return SynchronizationContext.Current == null; }
-        }
+	public struct ContextRemover : INotifyCompletion
+	{
+		public bool IsCompleted => SynchronizationContext.Current == null;
 
-        public void OnCompleted(Action continuation)
-        {
-            var prevContext = SynchronizationContext.Current;
-            if (prevContext == null)
-            {
-                continuation();
-                return;
-            }
-            try
-            {
-                SynchronizationContext.SetSynchronizationContext(null);
-                continuation();
-            }
-            finally
-            {
-                SynchronizationContext.SetSynchronizationContext(prevContext);
-            }
-        }
+		public void OnCompleted(Action continuation)
+		{
+			SynchronizationContext prevContext = SynchronizationContext.Current;
+			if (prevContext == null)
+			{
+				continuation();
+				return;
+			}
+			try
+			{
+				SynchronizationContext.SetSynchronizationContext(null);
+				continuation();
+			}
+			finally
+			{
+				SynchronizationContext.SetSynchronizationContext(prevContext);
+			}
+		}
 
-        public ContextRemover GetAwaiter()
-        {
-            return this;
-        }
+		public ContextRemover GetAwaiter()
+		{
+			return this;
+		}
 
-        public void GetResult()
-        {
-            // no need to return any value here
-            // the purpose is to remove context
-        }
-    }
+		public void GetResult()
+		{
+			// no need to return any value here
+			// the purpose is to remove context
+		}
+	}
 }

@@ -14,15 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Walmart.Sdk.Base.Http.Fetcher
 {
-    public interface IFetcher
-    {
-        Task<IResponse> ExecuteAsync(IRequest request);
-    }
+	public interface IFetcher
+	{
+		Task<IResponse> ExecuteAsync(IRequest request);
+	}
 }

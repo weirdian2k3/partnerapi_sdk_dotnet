@@ -2,8 +2,8 @@
 
 namespace Walmart.Sdk.Marketplace.V3.Payload.Return
 {
-	using Newtonsoft.Json;
 	using System.Collections.Generic;
+	using Newtonsoft.Json;
 
 	public class ReturnsListType
 	{

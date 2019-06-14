@@ -16,128 +16,128 @@ limitations under the License.
 
 namespace Walmart.Sdk.Base.Test.Http.RetryPolicy
 {
-    using System.Threading.Tasks;
-    using Xunit;
-    using Moq;
+	using System.Threading.Tasks;
+	using Moq;
+	using Xunit;
 
-    public class RetryPolicyTests
-    {
-        [Fact]
-        public void FixedCountAttemptsCountShouldBePositive()
-        {
-            Assert.Throws<Base.Exception.InitException>(
-                () => new Base.Http.Retry.FixedCountPolicy(-1)
-            );
-        }
+	public class RetryPolicyTests
+	{
+		[Fact]
+		public void FixedCountAttemptsCountShouldBePositive()
+		{
+			Assert.Throws<Base.Exception.InitException>(
+			    () => new Base.Http.Retry.FixedCountPolicy(-1)
+			);
+		}
 
-        [Fact]
-        public async Task FixedCountNonHttpExceptionBubblesUp()
-        {
-            var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
-            var request = new Mock<Base.Http.IRequest>();
+		[Fact]
+		public async Task FixedCountNonHttpExceptionBubblesUp()
+		{
+			var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
+			var request = new Mock<Base.Http.IRequest>();
 
-            var policy = new Base.Http.Retry.FixedCountPolicy(1);
+			var policy = new Base.Http.Retry.FixedCountPolicy(1);
 
-            fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
-                .ThrowsAsync(new Base.Http.Exception.ClientException("test"));
+			fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
+			    .ThrowsAsync(new Base.Http.Exception.ClientException("test"));
 
-            await Assert.ThrowsAsync<Base.Http.Exception.ClientException>(
-                () => policy.GetResponse(fetcher.Object, request.Object)
-            );
-        }
+			await Assert.ThrowsAsync<Base.Http.Exception.ClientException>(
+			    () => policy.GetResponse(fetcher.Object, request.Object)
+			);
+		}
 
-        [Fact]
-        public async Task FixedCountReturnResultForSuccessWithoutRetries()
-        {
-            var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
-            var request = new Mock<Base.Http.IRequest>();
-            var response = new Mock<Base.Http.IResponse>();
+		[Fact]
+		public async Task FixedCountReturnResultForSuccessWithoutRetries()
+		{
+			var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
+			var request = new Mock<Base.Http.IRequest>();
+			var response = new Mock<Base.Http.IResponse>();
 
-            fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>())).ReturnsAsync(response.Object);
+			fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>())).ReturnsAsync(response.Object);
 
-            var policy = new Base.Http.Retry.FixedCountPolicy(1);
-            var result = await policy.GetResponse(fetcher.Object, request.Object);
-            Assert.Equal(result, response.Object);
-        }
+			var policy = new Base.Http.Retry.FixedCountPolicy(1);
+			Base.Http.IResponse result = await policy.GetResponse(fetcher.Object, request.Object);
+			Assert.Equal(result, response.Object);
+		}
 
-        [Fact]
-        public async Task FixedCountThrowsExceptionWhenAllRetriesSpend()
-        {
-            var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
-            var request = new Mock<Base.Http.IRequest>();
+		[Fact]
+		public async Task FixedCountThrowsExceptionWhenAllRetriesSpend()
+		{
+			var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
+			var request = new Mock<Base.Http.IRequest>();
 
-            fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
-                .ThrowsAsync(new Base.Http.Exception.HttpException("test"));
+			fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
+			    .ThrowsAsync(new Base.Http.Exception.HttpException("test"));
 
-            var policy = new Base.Http.Retry.FixedCountPolicy(1);
-            await Assert.ThrowsAsync<Base.Http.Exception.NoRetriesLeftException>(
-                () => policy.GetResponse(fetcher.Object, request.Object)
-            );
-        }
+			var policy = new Base.Http.Retry.FixedCountPolicy(1);
+			await Assert.ThrowsAsync<Base.Http.Exception.NoRetriesLeftException>(
+			    () => policy.GetResponse(fetcher.Object, request.Object)
+			);
+		}
 
-        [Fact]
-        public async Task FixedCountMultipleAttemptsGiveResult()
-        {
-            var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
-            var request = new Mock<Base.Http.IRequest>();
-            var response = new Mock<Base.Http.IResponse>();
+		[Fact]
+		public async Task FixedCountMultipleAttemptsGiveResult()
+		{
+			var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
+			var request = new Mock<Base.Http.IRequest>();
+			var response = new Mock<Base.Http.IResponse>();
 
-            fetcher.SetupSequence(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
-                .ThrowsAsync(new Base.Http.Exception.HttpException("test"))
-                .ThrowsAsync(new Base.Http.Exception.HttpException("test"))
-                .Returns(Task.FromResult(response.Object));
+			fetcher.SetupSequence(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
+			    .ThrowsAsync(new Base.Http.Exception.HttpException("test"))
+			    .ThrowsAsync(new Base.Http.Exception.HttpException("test"))
+			    .Returns(Task.FromResult(response.Object));
 
-            var policy = new Base.Http.Retry.FixedCountPolicy(3);
-            var result = await policy.GetResponse(fetcher.Object, request.Object);
+			var policy = new Base.Http.Retry.FixedCountPolicy(3);
+			Base.Http.IResponse result = await policy.GetResponse(fetcher.Object, request.Object);
 
-            Assert.Equal(result, response.Object);
-        }
+			Assert.Equal(result, response.Object);
+		}
 
 
-        [Fact]
-        public async Task LuckyMeNonHttpExceptionBubblesUp()
-        {
-            var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
-            var request = new Mock<Base.Http.IRequest>();
+		[Fact]
+		public async Task LuckyMeNonHttpExceptionBubblesUp()
+		{
+			var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
+			var request = new Mock<Base.Http.IRequest>();
 
-            var policy = new Base.Http.Retry.LuckyMePolicy();
+			var policy = new Base.Http.Retry.LuckyMePolicy();
 
-            fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
-                .ThrowsAsync(new Base.Http.Exception.ClientException("test"));
+			fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
+			    .ThrowsAsync(new Base.Http.Exception.ClientException("test"));
 
-            await Assert.ThrowsAsync<Base.Http.Exception.ClientException>(
-                () => policy.GetResponse(fetcher.Object, request.Object)
-            );
-        }
+			await Assert.ThrowsAsync<Base.Http.Exception.ClientException>(
+			    () => policy.GetResponse(fetcher.Object, request.Object)
+			);
+		}
 
-        [Fact]
-        public async Task LuckyMeBubbleUpHttpException()
-        {
-            var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
-            var request = new Mock<Base.Http.IRequest>();
+		[Fact]
+		public async Task LuckyMeBubbleUpHttpException()
+		{
+			var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
+			var request = new Mock<Base.Http.IRequest>();
 
-            fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
-                .ThrowsAsync(new Base.Http.Exception.HttpException("test"));
+			fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
+			    .ThrowsAsync(new Base.Http.Exception.HttpException("test"));
 
-            var policy = new Base.Http.Retry.LuckyMePolicy();
-            await Assert.ThrowsAsync<Base.Http.Exception.HttpException>(
-                () => policy.GetResponse(fetcher.Object, request.Object)
-            );
-        }
+			var policy = new Base.Http.Retry.LuckyMePolicy();
+			await Assert.ThrowsAsync<Base.Http.Exception.HttpException>(
+			    () => policy.GetResponse(fetcher.Object, request.Object)
+			);
+		}
 
-        [Fact]
-        public async Task LuckyMeFetchResult()
-        {
-            var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
-            var request = new Mock<Base.Http.IRequest>();
-            var response = new Mock<Base.Http.IResponse>();
+		[Fact]
+		public async Task LuckyMeFetchResult()
+		{
+			var fetcher = new Mock<Base.Http.Fetcher.IFetcher>();
+			var request = new Mock<Base.Http.IRequest>();
+			var response = new Mock<Base.Http.IResponse>();
 
-            fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
-                .Returns(Task.FromResult(response.Object));
+			fetcher.Setup(t => t.ExecuteAsync(It.IsAny<Base.Http.IRequest>()))
+			    .Returns(Task.FromResult(response.Object));
 
-            var policy = new Base.Http.Retry.LuckyMePolicy();
-            var result = await policy.GetResponse(fetcher.Object, request.Object);
-            Assert.Equal(result, response.Object);
-        }
-    }
+			var policy = new Base.Http.Retry.LuckyMePolicy();
+			Base.Http.IResponse result = await policy.GetResponse(fetcher.Object, request.Object);
+			Assert.Equal(result, response.Object);
+		}
+	}
 }

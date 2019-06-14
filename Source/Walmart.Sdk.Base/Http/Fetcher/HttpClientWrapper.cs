@@ -15,38 +15,37 @@ limitations under the License.
 */
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Walmart.Sdk.Base.Http.Fetcher
 {
-    class HttpClientWrapper: IHttpClient
-    {
-        private HttpClient client;
+	class HttpClientWrapper : IHttpClient
+	{
+		private HttpClient client;
 
-        public HttpClientWrapper()
-        {
-            var loggingHandler = new Logger(new HttpClientHandler());
-            client = new HttpClient(loggingHandler);
-        }
+		public HttpClientWrapper()
+		{
+			var loggingHandler = new Logger(new HttpClientHandler());
+			client = new HttpClient(loggingHandler);
+		}
 
-        public TimeSpan Timeout {
-            get { return client.Timeout; }
-            set { client.Timeout = value; }
-        }
+		public TimeSpan Timeout
+		{
+			get => client.Timeout;
+			set => client.Timeout = value;
+		}
 
-        public Uri BaseAddress
-        {
-            get { return client.BaseAddress; }
-            set { client.BaseAddress = value; }
-        }
+		public Uri BaseAddress
+		{
+			get => client.BaseAddress;
+			set => client.BaseAddress = value;
+		}
 
-        public async Task<IResponse> SendAsync(IRequest request)
-        {
-            var result = await client.SendAsync(request.HttpRequest);
-            return (IResponse)new Response(result);
-        }
-    }
+		public async Task<IResponse> SendAsync(IRequest request)
+		{
+			HttpResponseMessage result = await client.SendAsync(request.HttpRequest);
+			return new Response(result);
+		}
+	}
 }

@@ -14,16 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Walmart.Sdk.Base.Primitive
 {
-    public interface IApiClient
-    {
-        ILoggerAdapter Logger { get; set; }
-        bool SimulationEnabled { get; set; }
-        Http.Retry.IRetryPolicy RetryPolicy { get; set; }
-    }
+	public interface IApiClient
+	{
+		ILoggerAdapter Logger { get; set; }
+		bool SimulationEnabled { get; set; }
+		Http.Retry.IRetryPolicy RetryPolicy { get; set; }
+	}
 }

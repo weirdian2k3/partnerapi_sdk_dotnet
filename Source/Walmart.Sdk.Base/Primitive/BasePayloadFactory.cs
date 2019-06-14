@@ -14,29 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
 using Walmart.Sdk.Base.Serialization;
 
 namespace Walmart.Sdk.Base.Primitive
 {
-    public abstract class BasePayloadFactory : IPayloadFactory
-    {
-        protected static SerializerFactory serializerFactory;
+	public abstract class BasePayloadFactory : IPayloadFactory
+	{
+		protected static SerializerFactory serializerFactory;
 
-        static BasePayloadFactory()
-        {
-            serializerFactory = new SerializerFactory();
-        }
+		static BasePayloadFactory()
+		{
+			serializerFactory = new SerializerFactory();
+		}
 
-        public ISerializer GetSerializer(ApiFormat format)
-        {
-            return serializerFactory.GetSerializer(format);
-        }
+		public ISerializer GetSerializer(ApiFormat format)
+		{
+			return serializerFactory.GetSerializer(format);
+		}
 
-        public abstract System.Exception CreateApiException(ApiFormat format, string content,
-            Base.Http.IResponse response);
-    }
+		public abstract System.Exception CreateApiException(ApiFormat format, string content,
+		    Base.Http.IResponse response);
+	}
 }

@@ -14,17 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Walmart.Sdk.Marketplace
 {
-    public class ClientConfig: Base.Primitive.BaseConfig
-    {
-        public ClientConfig(string consumerId, string privateKey) : base(consumerId, privateKey)
-        { }
-        
-        override public string ServiceName { get; set; } = "Walmart Marketplace";
-    }
+	public class ClientConfig : Base.Primitive.BaseConfig
+	{
+		public ClientConfig(string clientId, string clientSecret, string accessToken) : base(clientId, clientSecret, accessToken)
+		{ }
+
+		override public string ServiceName { get; set; } = "Walmart Marketplace";
+	}
 }

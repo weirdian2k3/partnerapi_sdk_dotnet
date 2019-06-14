@@ -16,40 +16,39 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.IntegrationTests.V2
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Xunit;
-    using Walmart.Sdk.Marketplace.V2.Api;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
-    using Walmart.Sdk.Marketplace.V2.Payload.LagTime;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Marketplace.V2.Api;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using Walmart.Sdk.Marketplace.V2.Payload.LagTime;
+	using Xunit;
 
-    public class LagTimeEndpointTests : BaseIntegrationTest
-    {
-        private LagTimeEndpoint lagtimeApi;
-        
-        public LagTimeEndpointTests()
-        {
-            var config = new ClientConfig("test", "test-key");
-            var apiClient = new ApiClient(config);
-            apiClient.SimulationEnabled = true;
-            lagtimeApi = new LagTimeEndpoint(apiClient);
-        }
+	public class LagTimeEndpointTests : BaseIntegrationTest
+	{
+		private LagTimeEndpoint lagtimeApi;
 
-        [Fact]
-        public async Task UpdateLagTime()
-        {
-            var stream = GetRequestStub("V2.requestStub.updateLagTime");
-            var result = await lagtimeApi.UpdateLagTime(stream);
-            Assert.IsType<FeedAcknowledgement>(result);
-        }
+		public LagTimeEndpointTests()
+		{
+			var config = new ClientConfig("test", "test-key");
+			var apiClient = new ApiClient(config)
+			{
+				SimulationEnabled = true
+			};
+			lagtimeApi = new LagTimeEndpoint(apiClient);
+		}
 
-        [Fact]
-        public async Task GetLagTime()
-        {
-            var result = await lagtimeApi.GetLagTime("test");
-            Assert.IsType<LagTime>(result);           
-        }
-    }
+		[Fact]
+		public async Task UpdateLagTime()
+		{
+			System.IO.Stream stream = GetRequestStub("V2.requestStub.updateLagTime");
+			FeedAcknowledgement result = await lagtimeApi.UpdateLagTime(stream);
+			Assert.IsType<FeedAcknowledgement>(result);
+		}
+
+		[Fact]
+		public async Task GetLagTime()
+		{
+			LagTime result = await lagtimeApi.GetLagTime("test");
+			Assert.IsType<LagTime>(result);
+		}
+	}
 }

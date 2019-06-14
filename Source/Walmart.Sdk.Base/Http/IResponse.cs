@@ -14,20 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Walmart.Sdk.Base.Http
 {
-    public interface IResponse
-    {
-        HttpStatusCode StatusCode { get; }
-        HttpResponseMessage RawResponse { get; }
-        bool IsSuccessful { get; }
-        Task<string> GetPayloadAsString();
-    }
+	public interface IResponse
+	{
+		HttpStatusCode StatusCode { get; }
+		HttpResponseMessage RawResponse { get; }
+		bool IsSuccessful { get; }
+		Task<string> GetPayloadAsString();
+	}
 }

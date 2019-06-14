@@ -16,76 +16,91 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V2.Api
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Base.Primitive;
-    using Walmart.Sdk.Marketplace.V2.Payload.Feed;
+	using System.Collections.Generic;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Base.Primitive;
+	using Walmart.Sdk.Marketplace.V2.Payload.Feed;
 
-    public class FeedEndpoint: BaseEndpoint
-    {
-        public FeedEndpoint(IEndpointClient apiClient): base(apiClient)
-        {
-            payloadFactory = new Payload.PayloadFactory();
-        }
+	public class FeedEndpoint : BaseEndpoint
+	{
+		public FeedEndpoint(IEndpointClient apiClient) : base(apiClient)
+		{
+			payloadFactory = new Payload.PayloadFactory();
+		}
 
-        public async Task<PartnerFeedResponse> GetFeedStatus(string feedId, bool includeDetails = false, int offset = 0, int limit = 0)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<PartnerFeedResponse> GetFeedStatus(string feedId, bool includeDetails = false, int offset = 0, int limit = 0)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var request = CreateRequest();
-            request.EndpointUri = string.Format("/v2/feeds/{0}", feedId);
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = string.Format("/v2/feeds/{0}", feedId);
 
-            request.QueryParams.Add("feedId", feedId);
-            if (includeDetails)
-            {
-                request.QueryParams.Add("includeDetails", "true");
-                if (offset > 0) request.QueryParams.Add("offset", offset.ToString());
-                if (limit > 0)
-                {
-                    if (limit > 1000) throw new System.Exception("Parameter 'limit' can't be more than 1000!");
-                    request.QueryParams.Add("limit", limit.ToString());
-                }
-            }
-            
-            var response = await client.GetAsync(request);
-            PartnerFeedResponse result = await ProcessResponse<PartnerFeedResponse>(response);
-            return result;
-        }
+			request.QueryParams.Add("feedId", feedId);
+			if (includeDetails)
+			{
+				request.QueryParams.Add("includeDetails", "true");
+				if (offset > 0)
+				{
+					request.QueryParams.Add("offset", offset.ToString());
+				}
 
-        public async Task<FeedRecordResponse> GetAllFeedStatuses(int offset = 0, int limit = 10)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+				if (limit > 0)
+				{
+					if (limit > 1000)
+					{
+						throw new System.Exception("Parameter 'limit' can't be more than 1000!");
+					}
 
-            var request = CreateRequest();
-            request.EndpointUri = "/v2/feeds";
+					request.QueryParams.Add("limit", limit.ToString());
+				}
+			}
 
-            if (offset > 0) request.QueryParams.Add("offset", offset.ToString());
-            if (limit > 0) request.QueryParams.Add("limit", limit.ToString());
+			Base.Http.IResponse response = await client.GetAsync(request);
+			PartnerFeedResponse result = await ProcessResponse<PartnerFeedResponse>(response);
+			return result;
+		}
 
-            var response = await client.GetAsync(request);
-            FeedRecordResponse result = await ProcessResponse<FeedRecordResponse>(response);
+		public async Task<FeedRecordResponse> GetAllFeedStatuses(int offset = 0, int limit = 10)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            return result;
-        }
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = "/v2/feeds";
 
-        public async Task<FeedAcknowledgement> UploadFeed(System.IO.Stream file, V2.Payload.FeedType feedType)
-        {
-            // avoiding deadlock if client execute this method synchronously
-            await new ContextRemover();
+			if (offset > 0)
+			{
+				request.QueryParams.Add("offset", offset.ToString());
+			}
 
-            Dictionary<string, string> queryParams = new Dictionary<string, string>();
-            var request = CreateRequest();
-            request.EndpointUri = "/v2/feeds";
+			if (limit > 0)
+			{
+				request.QueryParams.Add("limit", limit.ToString());
+			}
 
-            request.QueryParams.Add("feedType", feedType.ToString());
+			Base.Http.IResponse response = await client.GetAsync(request);
+			FeedRecordResponse result = await ProcessResponse<FeedRecordResponse>(response);
 
-            request.AddMultipartContent(file);
+			return result;
+		}
 
-            var response = await client.PostAsync(request);
-            var result = await ProcessResponse<FeedAcknowledgement>(response);
-            return result;
-        }
-    }
+		public async Task<FeedAcknowledgement> UploadFeed(System.IO.Stream file, V2.Payload.FeedType feedType)
+		{
+			// avoiding deadlock if client execute this method synchronously
+			await new ContextRemover();
+
+			var queryParams = new Dictionary<string, string>();
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = "/v2/feeds";
+
+			request.QueryParams.Add("feedType", feedType.ToString());
+
+			request.AddMultipartContent(file);
+
+			Base.Http.IResponse response = await client.PostAsync(request);
+			FeedAcknowledgement result = await ProcessResponse<FeedAcknowledgement>(response);
+			return result;
+		}
+	}
 }

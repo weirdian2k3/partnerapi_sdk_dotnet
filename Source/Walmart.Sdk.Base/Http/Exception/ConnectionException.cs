@@ -14,16 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Walmart.Sdk.Base.Http.Exception
 {
-    public class ConnectionException: HttpException
-    {
-        public ConnectionException(string message, System.Exception ex) : base(message, ex)
-        {
-        }
-    }
+	public class ConnectionException : HttpException
+	{
+		public ConnectionException(string message, System.Exception ex) : base(message, ex)
+		{
+		}
+	}
 }

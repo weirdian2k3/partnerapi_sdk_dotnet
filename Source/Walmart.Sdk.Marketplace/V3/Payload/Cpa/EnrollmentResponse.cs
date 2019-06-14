@@ -16,13 +16,13 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V3.Payload.Cpa
 {
-    using Newtonsoft.Json;
+	using Newtonsoft.Json;
 
-    public class EnrollmentResponse
-    {
-        [JsonProperty(PropertyName = "enroll_price_adjustment")]
-        public bool EnrollStatus;
-        [JsonProperty(PropertyName = "martId")]
-        public string MartId;
-    }
+	public class EnrollmentResponse
+	{
+		[JsonProperty(PropertyName = "enroll_price_adjustment")]
+		public bool EnrollStatus;
+		[JsonProperty(PropertyName = "martId")]
+		public string MartId;
+	}
 }

@@ -14,15 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Walmart.Sdk.Base.Http
 {
-    public interface IClientHttpHandler
-    {
-        Retry.IRetryPolicy RetryPolicy { get; set; }
-        bool SimulationEnabled { get; set; }
-    }
+	public interface IClientHttpHandler
+	{
+		Retry.IRetryPolicy RetryPolicy { get; set; }
+		bool SimulationEnabled { get; set; }
+	}
 }

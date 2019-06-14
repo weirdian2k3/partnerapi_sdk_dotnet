@@ -14,20 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Walmart.Sdk.Base.Primitive.Config
 {
-    public interface IRequestConfig
-    {
-        ApiFormat ApiFormat { get; }
-        string BaseUrl { get; }
-        string ServiceName { get; }
-        string ChannelType { get; }
-        string UserAgent { get; }
-        Credentials Credentials { get; }
-        int RequestTimeoutMs { get; }
-    }
+	public interface IRequestConfig
+	{
+		ApiFormat ApiFormat { get; }
+		string BaseUrl { get; }
+		string ServiceName { get; }
+		string ChannelType { get; }
+		string UserAgent { get; }
+		Credentials Credentials { get; }
+		int RequestTimeoutMs { get; }
+	}
 }

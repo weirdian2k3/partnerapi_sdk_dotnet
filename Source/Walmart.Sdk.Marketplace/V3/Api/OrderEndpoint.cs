@@ -16,169 +16,178 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V3.Api
 {
-    using System;
-    using System.Threading.Tasks;
-    using Walmart.Sdk.Base.Http;
-    using Walmart.Sdk.Marketplace.V3.Payload.Order;
-    using Walmart.Sdk.Base.Primitive;
-    using Walmart.Sdk.Marketplace.V3.Api.Request;
+	using System;
+	using System.Threading.Tasks;
+	using Walmart.Sdk.Base.Http;
+	using Walmart.Sdk.Base.Primitive;
+	using Walmart.Sdk.Marketplace.V3.Api.Request;
+	using Walmart.Sdk.Marketplace.V3.Payload.Order;
 
-    public class OrderEndpoint : BaseEndpoint
-    {
-        private enum OrderAction
-        {
-            Ack,
-            Cancel,
-            Refund,
-            Shipping
-        }
+	public class OrderEndpoint : BaseEndpoint
+	{
+		private enum OrderAction
+		{
+			Ack,
+			Cancel,
+			Refund,
+			Shipping
+		}
 
-        public OrderEndpoint(ApiClient client) : base(client)
-        {
-            payloadFactory = new V3.Payload.PayloadFactory();
-        }
+		public OrderEndpoint(ApiClient client) : base(client)
+		{
+			payloadFactory = new V3.Payload.PayloadFactory();
+		}
 
-        public async Task<OrdersListType> GetAllReleasedOrders(DateTime createdStartDate, DateTime createdEndDate, int limit = 20)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<OrdersListType> GetAllReleasedOrders(DateTime createdStartDate, DateTime createdEndDate, int limit = 20)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var request = CreateRequest();
+			Base.Http.Request request = CreateRequest();
 
-            request.EndpointUri = "/v3/orders/released";
+			request.EndpointUri = "/v3/orders/released";
 
-            if (limit < 1) limit = 1;
-            if (limit > 200) limit = 200;
+			if (limit < 1)
+			{
+				limit = 1;
+			}
 
-            request.QueryParams.Add("limit", limit.ToString());
-            request.QueryParams.Add("createdStartDate", createdStartDate.ToString("yyyy-MM-dd"));
-            request.QueryParams.Add("createdEndDate", createdEndDate.ToString("yyyy-MM-dd"));
+			if (limit > 200)
+			{
+				limit = 200;
+			}
 
-            var response = await client.GetAsync(request);
-            var result = await ProcessResponse<OrdersListType>(response);
-            return result;
-        }
+			request.QueryParams.Add("limit", limit.ToString());
+			request.QueryParams.Add("createdStartDate", createdStartDate.ToString("yyyy-MM-dd"));
+			request.QueryParams.Add("createdEndDate", createdEndDate.ToString("yyyy-MM-dd"));
 
-        public async Task<OrdersListType> GetAllReleasedOrders(string nextCursor)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+			IResponse response = await client.GetAsync(request);
+			OrdersListType result = await ProcessResponse<OrdersListType>(response);
+			return result;
+		}
 
-            var request = CreateRequest();
-            request.EndpointUri = String.Format("/v3/orders/released/{0}", nextCursor);
-            var response = await client.GetAsync(request);
-            var result = await ProcessResponse<OrdersListType>(response);
-            return result;
-        }
+		public async Task<OrdersListType> GetAllReleasedOrders(string nextCursor)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-        public async Task<Order> GetOrderById(string purchaseOrderId)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = string.Format("/v3/orders/released/{0}", nextCursor);
+			IResponse response = await client.GetAsync(request);
+			OrdersListType result = await ProcessResponse<OrdersListType>(response);
+			return result;
+		}
 
-            var request = CreateRequest();
-            request.EndpointUri = String.Format("/v3/orders/{0}", purchaseOrderId);
-            var response = await client.GetAsync(request);
-            var result = await ProcessResponse<Order>(response);
-            return result;
-        }
+		public async Task<Order> GetOrderById(string purchaseOrderId)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-        public async Task<OrdersListType> GetAllOrders(OrderFilter filter)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = string.Format("/v3/orders/{0}", purchaseOrderId);
+			IResponse response = await client.GetAsync(request);
+			Order result = await ProcessResponse<Order>(response);
+			return result;
+		}
 
-            var request = CreateRequest();
-            filter.FullfilRequest(request);
-            request.EndpointUri = "/v3/orders";
-            var response = await client.GetAsync(request);
-            var result = await ProcessResponse<OrdersListType>(response);
-            return result;
-        }
+		public async Task<OrdersListType> GetAllOrders(OrderFilter filter)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-        public async Task<OrdersListType> GetAllOrders(string nextCursor)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+			Base.Http.Request request = CreateRequest();
+			filter.FullfilRequest(request);
+			request.EndpointUri = "/v3/orders";
+			IResponse response = await client.GetAsync(request);
+			OrdersListType result = await ProcessResponse<OrdersListType>(response);
+			return result;
+		}
 
-            var request = CreateRequest();
-            request.EndpointUri = String.Format("/v3/orders/{0}", nextCursor);
-            var response = await client.GetAsync(request);
-            var result = await ProcessResponse<OrdersListType>(response);
-            return result;
-        }
+		public async Task<OrdersListType> GetAllOrders(string nextCursor)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-        private async Task<IResponse> UpdateOrder(string purchaseOrderId, OrderAction desiredAction, System.IO.Stream stream = null)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+			Base.Http.Request request = CreateRequest();
+			request.EndpointUri = string.Format("/v3/orders/{0}", nextCursor);
+			IResponse response = await client.GetAsync(request);
+			OrdersListType result = await ProcessResponse<OrdersListType>(response);
+			return result;
+		}
 
-            string action = "";
-            switch (desiredAction)
-            {
-                case OrderAction.Ack:
-                    action = "acknowledge";
-                    break;
-                case OrderAction.Cancel:
-                    action = "cancel";
-                    break;
-                case OrderAction.Refund:
-                    action = "refund";
-                    break;
-                case OrderAction.Shipping:
-                    action = "shipping";
-                    break;
-                default:
-                    throw new Base.Exception.InvalidValueException("Unknown order action provided >" + action.ToString() + "<");
-            }
-            var request = CreateRequest();
-            if (stream != null)
-            {
-                request.AddMultipartContent(stream);
-            }
-            request.EndpointUri = String.Format("/v3/orders/{0}/{1}", purchaseOrderId, action);
-            var response = await client.PostAsync(request);
-            return response;
-        }
+		private async Task<IResponse> UpdateOrder(string purchaseOrderId, OrderAction desiredAction, System.IO.Stream stream = null)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
+			Base.Http.Request request = CreateRequest();
 
-        public async Task<Order> AckOrder(string purchaseOrderId)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+			var action = "";
+			switch (desiredAction)
+			{
+				case OrderAction.Ack:
+					action = "acknowledge";
+					request.AddPayload(string.Empty);
+					break;
+				case OrderAction.Cancel:
+					action = "cancel";
+					break;
+				case OrderAction.Refund:
+					action = "refund";
+					break;
+				case OrderAction.Shipping:
+					action = "shipping";
+					break;
+				default:
+					throw new Base.Exception.InvalidValueException("Unknown order action provided >" + action.ToString() + "<");
+			}
 
-            var response = await UpdateOrder(purchaseOrderId, OrderAction.Ack);
-            var result = await ProcessResponse<Order>(response);
-            return result;
-        }
+			if (stream != null)
+			{
+				request.AddPayload(stream);
+			}
+			request.EndpointUri = string.Format("/v3/orders/{0}/{1}", purchaseOrderId, action);
+			IResponse response = await client.PostAsync(request);
+			return response;
+		}
 
-        public async Task<Order> CancelOrderLines(string purchaseOrderId, System.IO.Stream stream)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<Order> AckOrder(string purchaseOrderId)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var response = await UpdateOrder(purchaseOrderId, OrderAction.Cancel);
-            var result = await ProcessResponse<Order>(response);
-            return result;
-        }
+			IResponse response = await UpdateOrder(purchaseOrderId, OrderAction.Ack);
+			Order result = await ProcessResponse<Order>(response);
+			return result;
+		}
 
-        public async Task<Order> RefundOrderLines(string purchaseOrderId, System.IO.Stream stream)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<Order> CancelOrderLines(string purchaseOrderId, System.IO.Stream stream)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var response = await UpdateOrder(purchaseOrderId, OrderAction.Refund);
-            var result = await ProcessResponse<Order>(response);
-            return result;
-        }
+			IResponse response = await UpdateOrder(purchaseOrderId, OrderAction.Cancel, stream);
+			Order result = await ProcessResponse<Order>(response);
+			return result;
+		}
 
-        public async Task<Order> ShippingUpdates(string purchaseOrderId, System.IO.Stream stream)
-        {
-            // to avoid deadlock if this method is executed synchronously
-            await new ContextRemover();
+		public async Task<Order> RefundOrderLines(string purchaseOrderId, System.IO.Stream stream)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
 
-            var response = await UpdateOrder(purchaseOrderId, OrderAction.Shipping);
-            var result = await ProcessResponse<Order>(response);
-            return result;
-        }
-    }
+			IResponse response = await UpdateOrder(purchaseOrderId, OrderAction.Refund, stream);
+			Order result = await ProcessResponse<Order>(response);
+			return result;
+		}
+
+		public async Task<Order> ShippingUpdates(string purchaseOrderId, System.IO.Stream stream)
+		{
+			// to avoid deadlock if this method is executed synchronously
+			await new ContextRemover();
+
+			IResponse response = await UpdateOrder(purchaseOrderId, OrderAction.Shipping, stream);
+			Order result = await ProcessResponse<Order>(response);
+			return result;
+		}
+	}
 }

@@ -16,45 +16,42 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.E2ETests.V2
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using System.IO;
-    using Xunit;
-    using Walmart.Sdk.Marketplace.V2.Api;
-    
-    public class ReportEndpointTests : BaseE2ETest
-    {
-        private ReportEndpoint reportApi;
+	using System.IO;
+	using Walmart.Sdk.Marketplace.V2.Api;
+	using Xunit;
 
-        public ReportEndpointTests()
-        {
-            reportApi = new ReportEndpoint(client);
-        }
+	public class ReportEndpointTests : BaseE2ETest
+	{
+		private ReportEndpoint reportApi;
 
-        [Fact]
-        public async void GetItemReport()
-        {
-            string folderName = Directory.GetCurrentDirectory() + @"\";
-            var result = await reportApi.GetItemReport(folderName);
-            Assert.True(File.Exists(result));
-        }
+		public ReportEndpointTests()
+		{
+			reportApi = new ReportEndpoint(client);
+		}
 
-        [Fact]
-        public async void GetBuyBoxReport()
-        {
-            string folderName = Directory.GetCurrentDirectory() + @"\";
-            var result = await reportApi.GetBuyBoxReport(folderName);
-            Assert.True(File.Exists(result));
-        }
+		[Fact]
+		public async void GetItemReport()
+		{
+			var folderName = Directory.GetCurrentDirectory() + @"\";
+			var result = await reportApi.GetItemReport(folderName);
+			Assert.True(File.Exists(result));
+		}
 
-        [Fact]
-        public async void GetCPAReport()
-        {
-            string folderName = Directory.GetCurrentDirectory() + @"\";
-            var result = await reportApi.GetCPAReport(folderName);
-            Assert.True(File.Exists(result));
-        }
+		[Fact]
+		public async void GetBuyBoxReport()
+		{
+			var folderName = Directory.GetCurrentDirectory() + @"\";
+			var result = await reportApi.GetBuyBoxReport(folderName);
+			Assert.True(File.Exists(result));
+		}
 
-    }
+		[Fact]
+		public async void GetCPAReport()
+		{
+			var folderName = Directory.GetCurrentDirectory() + @"\";
+			var result = await reportApi.GetCPAReport(folderName);
+			Assert.True(File.Exists(result));
+		}
+
+	}
 }

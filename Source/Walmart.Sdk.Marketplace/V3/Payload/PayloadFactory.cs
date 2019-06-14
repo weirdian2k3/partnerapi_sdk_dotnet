@@ -16,35 +16,35 @@ limitations under the License.
 
 namespace Walmart.Sdk.Marketplace.V3.Payload
 {
-    using System;
-    using Walmart.Sdk.Marketplace.V3.Api.Exception;
-    using Walmart.Sdk.Base.Http;
-    using Walmart.Sdk.Base.Primitive;
+	using System;
+	using Walmart.Sdk.Base.Http;
+	using Walmart.Sdk.Base.Primitive;
+	using Walmart.Sdk.Marketplace.V3.Api.Exception;
 
-    public class PayloadFactory: Base.Primitive.BasePayloadFactory
-    {
-        public override Exception CreateApiException(ApiFormat format, string content, IResponse response)
-        {
-            try
-            {
-                var errors = GetSerializer(format).Deserialize<Feed.Errors>(content);
-                return ApiException.Factory(errors, response);
-            }
-            catch (Exception firstAttemptEx)
-            {
-                try
-                {
-                    var errors = GetSerializer(format).Deserialize<Feed.ErrorsWithoutNS>(content);
-                    return ApiException.Factory(errors, response);
-                }
-                catch (Exception secondAttempEx)
-                {
-                    var exceptionList = new Exception[] { firstAttemptEx, secondAttempEx };
-                    var aggrEx = new AggregateException("Unable to parse error response >" + content + "<", exceptionList);
-                    throw aggrEx;
-                }
-            }
-        }
+	public class PayloadFactory : Base.Primitive.BasePayloadFactory
+	{
+		public override Exception CreateApiException(ApiFormat format, string content, IResponse response)
+		{
+			try
+			{
+				Feed.Errors errors = GetSerializer(format).Deserialize<Feed.Errors>(content);
+				return ApiException.Factory(errors, response);
+			}
+			catch (Exception firstAttemptEx)
+			{
+				try
+				{
+					Feed.ErrorsWithoutNS errors = GetSerializer(format).Deserialize<Feed.ErrorsWithoutNS>(content);
+					return ApiException.Factory(errors, response);
+				}
+				catch (Exception secondAttempEx)
+				{
+					var exceptionList = new Exception[] { firstAttemptEx, secondAttempEx };
+					var aggrEx = new AggregateException("Unable to parse error response >" + content + "<", exceptionList);
+					throw aggrEx;
+				}
+			}
+		}
 
-    }
+	}
 }

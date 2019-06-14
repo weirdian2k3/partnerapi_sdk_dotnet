@@ -16,27 +16,25 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Walmart.Sdk.Base.Http;
-using Walmart.Sdk.Base.Primitive;
+using Walmart.Sdk.Base.Util;
 
 namespace Walmart.Sdk.Base.Http
 {
 	public class Request : IRequest
 	{
 		private Primitive.Config.IRequestConfig config;
-		public Primitive.Config.IRequestConfig Config { get { return config; } }
+		public Primitive.Config.IRequestConfig Config => config;
 		public string EndpointUri { get; set; }
 		public HttpRequestMessage HttpRequest { get; }
 		public Dictionary<string, string> QueryParams { get; set; } = new Dictionary<string, string>();
 
 		public HttpMethod Method
 		{
-			get { return HttpRequest.Method; }
-			set { HttpRequest.Method = value; }
+			get => HttpRequest.Method;
+			set => HttpRequest.Method = value;
 		}
 
 		public Request(Primitive.Config.IRequestConfig cfg)
@@ -56,20 +54,31 @@ namespace Walmart.Sdk.Base.Http
 
 		public void AddMultipartContent(System.IO.Stream contentStream)
 		{
-			var multipartContent = new MultipartFormDataContent();
-			multipartContent.Add(new StreamContent(contentStream));
+			var multipartContent = new MultipartFormDataContent
+			{
+				new StreamContent(contentStream)
+			};
 			HttpRequest.Content = multipartContent;
 		}
 
 		public void AddPayload(string payload)
 		{
-			HttpRequest.Content = new StringContent((string)payload, Encoding.UTF8, GetContentType());
+			HttpRequest.Content = new StringContent(payload, Encoding.UTF8, GetContentType());
+			HttpRequest.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-www-form-urlencoded");
+		}
+
+		public void AddPayload(Stream stream)
+		{
+			using (var reader = new StreamReader(stream))
+			{
+				HttpRequest.Content = new StringContent(reader.ReadToEnd(), Encoding.UTF8, GetContentType());
+			}
 		}
 
 		public string BuildQueryParams()
 		{
 			var list = new List<string>();
-			foreach (var param in this.QueryParams)
+			foreach (KeyValuePair<string, string> param in QueryParams)
 			{
 				if (param.Value != null)
 				{
@@ -94,16 +103,23 @@ namespace Walmart.Sdk.Base.Http
 
 		private void AddWalmartHeaders()
 		{
-			string timestamp = Util.DigitalSignature.GetCurrentTimestamp();
-			string signature = GetSignature(timestamp);
+			var timestamp = Util.DigitalSignature.GetCurrentTimestamp();
 
-			var creds = config.Credentials;
-			HttpRequest.Headers.Add("WM_SEC.AUTH_SIGNATURE", signature);
+			Primitive.Credentials creds = config.Credentials;
+
+			if (!string.IsNullOrEmpty(creds.AccessToken))
+			{
+				HttpRequest.Headers.Add("WM_SEC.ACCESS_TOKEN", creds.AccessToken);
+			}
+
 			HttpRequest.Headers.Add("WM_SEC.TIMESTAMP", timestamp);
 			HttpRequest.Headers.Add("WM_CONSUMER.CHANNEL.TYPE", config.ChannelType);
-			HttpRequest.Headers.Add("WM_CONSUMER.ID", creds.ConsumerId);
+
+			var base64String = Base64Converter.Base64Encode(string.Format("{0}:{1}", creds.ClientId, creds.ClientSecret));
+
+			HttpRequest.Headers.Add("Authorization", "Basic " + base64String);
 			HttpRequest.Headers.Add("WM_SVC.NAME", config.ServiceName);
-			HttpRequest.Headers.Add("WM_QOS.CORRELATION_ID", Util.DigitalSignature.GetCorrelationId());
+			HttpRequest.Headers.Add("WM_QOS.CORRELATION_ID", DigitalSignature.GetCorrelationId());
 
 			if (!HttpRequest.Headers.Contains("Accept"))
 			{
@@ -120,35 +136,6 @@ namespace Walmart.Sdk.Base.Http
 				default:
 				case Primitive.ApiFormat.XML:
 					return "application/xml";
-			}
-		}
-
-		private string GetSignature(string timestamp)
-		{
-			if (config.Credentials is null)
-			{
-				throw new Base.Exception.InitException("Configuration is not initialized with Merchant Credentials!");
-			}
-
-			var creds = config.Credentials;
-			var requestUri = HttpRequest.RequestUri.ToString();
-			var httpMethod = HttpRequest.Method.Method.ToUpper();
-			// Construct the string to sign
-			string stringToSign = string.Join("\n", new List<string>() {
-				creds.ConsumerId,
-				requestUri,
-				httpMethod,
-				timestamp
-			}) + "\n"; // extra newline symbol required for valid signature
-
-			try
-			{
-				return Util.DigitalSignature.SignData(stringToSign, creds.PrivateKey);
-			}
-			catch (System.Exception ex)
-			{
-				//pop up this to the user of SDK 
-				throw Base.Exception.SignatureException.Factory(creds.ConsumerId, requestUri, httpMethod, ex);
 			}
 		}
 	}
